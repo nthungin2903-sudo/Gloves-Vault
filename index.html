@@ -1,0 +1,2941 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GLOVES VAULT - Cửa Hàng Găng Tay Game CS2 & Valorant</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Phóng to toàn bộ giao diện lên mức 110% như khi bấm Ctrl + */
+    html {
+      font-size: 110%;
+    }
+
+    /* Chế độ Tối (Dark Mode) */
+    body.theme-dark {
+      background-color: #121316;
+      color: #f3f4f6;
+    }
+    body.theme-dark .bg-card {
+      background-color: #1c1d22;
+      border-color: #2a2c33;
+    }
+    body.theme-dark .bg-sidebar {
+      background-color: #16171c;
+      border-color: #2a2c33;
+    }
+    body.theme-dark .bg-img-container {
+      background-color: transparent;
+    }
+    body.theme-dark .header-bg {
+      background-color: rgba(18, 19, 22, 0.95);
+      border-color: #2a2c33;
+    }
+    body.theme-dark .text-primary {
+      color: #ffffff;
+    }
+    body.theme-dark .text-secondary {
+      color: #9ca3af;
+    }
+
+    /* Chế độ Sáng (Light Mode) */
+    body.theme-light {
+      background-color: #ffffff;
+      color: #111827;
+    }
+    body.theme-light .bg-card {
+      background-color: #ffffff;
+      border-color: #e5e7eb;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    }
+    body.theme-light .bg-sidebar {
+      background-color: #ffffff;
+      border-color: #e5e7eb;
+    }
+    body.theme-light .bg-img-container {
+      background-color: transparent;
+    }
+    body.theme-light .header-bg {
+      background-color: rgba(255, 255, 255, 0.95);
+      border-color: #e5e7eb;
+    }
+    body.theme-light .text-primary {
+      color: #111827;
+    }
+    body.theme-light .text-secondary {
+      color: #4b5563;
+    }
+
+    /* Hiệu ứng chuyển động lơ lửng 3D dự phòng & mô phỏng (Floating 3D Showcase) */
+    @keyframes float3D {
+      0% { transform: translateY(0px) rotateY(0deg) rotateZ(0deg); }
+      25% { transform: translateY(-14px) rotateY(15deg) rotateZ(1.5deg); }
+      50% { transform: translateY(-22px) rotateY(0deg) rotateZ(0deg); }
+      75% { transform: translateY(-12px) rotateY(-15deg) rotateZ(-1.5deg); }
+      100% { transform: translateY(0px) rotateY(0deg) rotateZ(0deg); }
+    }
+
+    @keyframes shadowScale {
+      0%, 100% { transform: scale(1); opacity: 0.28; }
+      50% { transform: scale(0.75); opacity: 0.12; }
+    }
+
+    .animate-float-glove {
+      animation: float3D 6s ease-in-out infinite;
+      transform-style: preserve-3d;
+    }
+
+    .animate-float-shadow {
+      animation: shadowScale 6s ease-in-out infinite;
+    }
+
+    /* Marquee animation */
+    @keyframes marquee {
+      0% { transform: translateX(0%); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .animate-marquee {
+      display: inline-flex;
+      animation: marquee 18s linear infinite;
+    }
+
+    .animate-marquee:hover {
+      animation-play-state: paused;
+    }
+
+    /* Đảm bảo ảnh chính hiển thị sắc nét không viền nền */
+    .main-cutout-img {
+      background: transparent !important;
+      filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.18));
+    }
+
+    /* Khung cắt tự động chỉ lấy đúng vùng mã QR từ ảnh chụp màn hình điện thoại */
+    .qr-crop-box {
+      width: 196px;
+      height: 196px;
+      overflow: hidden;
+      position: relative;
+      border-radius: 14px;
+      background: #ffffff;
+    }
+    .qr-crop-bank-img {
+      width: 100%;
+      height: auto;
+      position: absolute;
+      left: 0;
+      top: -66%;
+      transform: scale(1.22);
+      transform-origin: center center;
+    }
+    .qr-crop-momo-img {
+      width: 100%;
+      height: auto;
+      position: absolute;
+      left: 0;
+      top: -42%;
+      transform: scale(1.28);
+      transform-origin: center center;
+    }
+  </style>
+</head>
+<body class="theme-dark min-h-screen flex flex-col font-sans transition-colors duration-200" id="app-body">
+
+  <!-- HEADER -->
+  <header class="sticky top-0 z-50 header-bg border-b backdrop-blur-md transition-colors duration-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      
+      <!-- LOGO -->
+      <a href="#" onclick="showHome3DView(); return false;" class="text-2xl font-black tracking-widest text-primary uppercase flex items-center gap-2">
+        <span>GLOVES VAULT</span>
+      </a>
+
+      <!-- NAV MENU SWITCHER -->
+      <div class="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm font-bold">
+        <button onclick="showHome3DView()" id="nav-home-btn" class="text-blue-600 transition-colors cursor-pointer">Trang chủ</button>
+        <button onclick="showProductList()" id="nav-shop-btn" class="text-secondary hover:text-primary transition-colors cursor-pointer">Cửa hàng</button>
+        <button onclick="showFaqContactView()" id="nav-faq-btn" class="text-secondary hover:text-primary transition-colors cursor-pointer">Liên hệ</button>
+      </div>
+
+      <!-- SEARCH BAR (SHOWS IN SHOP VIEW) -->
+      <div id="header-search-container" class="hidden flex-1 max-w-md mx-4">
+        <div class="relative">
+          <input 
+            type="text" 
+            id="search-input"
+            placeholder="Tìm găng tay, tựa game..." 
+            class="w-full bg-card border text-sm text-primary rounded-lg pl-4 pr-10 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder-gray-500"
+            oninput="handleFilter()"
+          />
+        </div>
+      </div>
+
+      <!-- RIGHT ACTIONS: DARK MODE TOGGLE & CART -->
+      <div class="flex items-center gap-2.5">
+        <button 
+          id="theme-toggle-btn"
+          onclick="toggleTheme()" 
+          title="Đổi chế độ Sáng / Tối"
+          class="p-2.5 rounded-lg bg-card border text-secondary hover:text-primary transition-all flex items-center justify-center cursor-pointer"
+        >
+          <!-- Moon Icon (Mặc định hiện vì trang đang ở chế độ Tối) -->
+          <svg id="moon-icon" class="w-5 h-5 block" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+          </svg>
+          <!-- Sun Icon -->
+          <svg id="sun-icon" class="w-5 h-5 hidden text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z" clip-rule="evenodd"></path>
+          </svg>
+        </button>
+
+        <button onclick="showCartView()" id="header-cart-btn" class="bg-card border text-primary px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center gap-2 cursor-pointer hover:border-blue-500">
+          <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
+          <span>Giỏ hàng</span>
+          <span class="text-secondary">·</span>
+          <span id="cart-count" class="font-bold">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- VIEW 0: FLOATING 3D VIDEO HERO HOME PAGE (FIXED MAIN VIDEO) -->
+  <section id="hero-3d-view" class="relative flex-1 flex flex-col justify-center items-center py-10 px-4 sm:px-6 lg:px-8 overflow-hidden bg-white text-gray-900">
+    
+    <!-- STUDIO RADIAL LIGHTING BACKGROUND -->
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none bg-[radial-gradient(circle_at_center,#ffffff_0%,#f4f4f6_75%,#e4e4e7_100%)]"></div>
+
+    <!-- MAIN HERO CONTENT -->
+    <div class="relative z-10 max-w-5xl mx-auto text-center space-y-6 flex flex-col items-center w-full">
+      
+      <!-- SUBTITLE BADGE -->
+      <span class="inline-flex items-center gap-2 bg-gray-900 text-white text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full shadow-sm">
+        <span class="w-2 h-2 rounded-full bg-purple-400 animate-ping"></span>
+        <span>3D SHOWCASE · SPORT GLOVES</span>
+      </span>
+
+      <!-- MAIN TITLE -->
+      <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-gray-900 uppercase max-w-4xl leading-none">
+        PANDORA'S <span class="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 bg-clip-text text-transparent">BOX</span>
+      </h1>
+
+      <!-- SUBTITLE VOICEOVER QUOTE FROM VIDEO -->
+      <p id="video-caption-text" class="text-sm sm:text-base text-gray-600 font-medium max-w-xl italic transition-opacity duration-300">
+        "Khám phá găng tay Pandora's Box. Thiết kế tinh xảo, chất liệu cao cấp. Hoàn hảo đến từng chi tiết nhỏ. Đặt hàng ngay hôm nay."
+      </p>
+
+      <!-- FIXED 3D VIDEO PLAYER SHOWCASE CONTAINER -->
+      <div class="relative w-full max-w-3xl rounded-3xl overflow-hidden bg-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.12)] border border-gray-200/80 flex flex-col items-center justify-center aspect-video">
+        
+        <video 
+          id="hero-glove-video"
+          src="gemini_generated_video_0d8e710f_gwr_video_mvp.mp4"
+          class="w-full h-full object-contain bg-white"
+          autoplay 
+          loop 
+          muted 
+          playsinline
+          onerror="handleHeroVideoError(this)"
+        ></video>
+
+        <!-- SÂN KHẤU 3D TỰ ĐỘNG HIỂN THỊ NẾU TRÌNH DUYỆT CHƯA TÌM THẤY FILE MP4 -->
+        <div id="interactive-3d-stage" class="hidden absolute inset-0 bg-white flex-col items-center justify-center p-6 select-none">
+          <div class="relative flex flex-col items-center justify-center h-full w-full">
+            <img 
+              id="stage-3d-img"
+              src="Pandora's Box - Main.jpg" 
+              onload="makeCutoutTransparent(this)"
+              onerror="handleSmartImgError(this, 1, 'main', 0)"
+              alt="Pandora's Box 3D Motion" 
+              class="animate-float-glove main-cutout-img max-h-60 sm:max-h-72 w-auto object-contain transition-all duration-500 cursor-pointer"
+              onclick="openProductDetail(1)"
+            />
+            <div class="animate-float-shadow w-44 sm:w-56 h-5 bg-black/25 rounded-[100%] blur-md mt-6"></div>
+          </div>
+        </div>
+
+        <!-- TOP-LEFT LIVE 3D BADGE -->
+        <div class="absolute top-4 left-4 flex items-center gap-2 bg-white/90 backdrop-blur-md border border-gray-200 px-3 py-1.5 rounded-full text-xs font-bold text-gray-800 shadow-sm pointer-events-none">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span>360° Studio View</span>
+        </div>
+
+      </div>
+
+      <!-- CALL TO ACTION BUTTONS -->
+      <div class="pt-3 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
+        <button 
+          onclick="openProductDetail(1)" 
+          class="w-full sm:w-auto bg-gray-900 hover:bg-black text-white font-black text-sm uppercase tracking-wider px-8 py-4 rounded-xl transition-all shadow-xl hover:scale-105 cursor-pointer"
+        >
+          Đặt hàng ngay
+        </button>
+
+        <button 
+          onclick="showProductList()" 
+          class="w-full sm:w-auto bg-white border border-gray-300 hover:bg-gray-100 text-gray-900 font-bold text-sm uppercase tracking-wider px-8 py-4 rounded-xl transition-all shadow-sm cursor-pointer"
+        >
+          Khám phá cửa hàng
+        </button>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- MAIN SHOPPING CONTENT CONTAINER -->
+  <main id="main-shop-container" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+    
+    <!-- PROMO BANNER (MARQUEE) -->
+    <div id="promo-banner" class="bg-white text-gray-900 border border-gray-200 rounded-xl p-4 sm:p-5 mb-8 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md overflow-hidden">
+      <div class="font-black text-2xl sm:text-3xl uppercase tracking-wider whitespace-nowrap z-10 bg-white pr-5 sm:border-r border-gray-200">
+        Store
+      </div>
+      <div class="w-full overflow-hidden relative flex-1 flex items-center">
+        <div class="animate-marquee whitespace-nowrap font-medium text-sm text-gray-700 flex items-center gap-8">
+          <span>🚚 Miễn phí vận chuyển cho đơn từ 1.000.000đ</span>
+          <span>•</span>
+          <span>🔄 Đổi trả trong 7 ngày</span>
+          <span>•</span>
+          <span>⚡ Mua sắm an toàn & bảo mật</span>
+          <span>•</span>
+          <span>🚚 Miễn phí vận chuyển cho đơn từ 1.000.000đ</span>
+          <span>•</span>
+          <span>🔄 Đổi trả trong 7 ngày</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 1: PRODUCT LIST VIEW -->
+    <div id="product-list-view" class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      
+      <!-- SIDEBAR FILTERS -->
+      <aside class="lg:col-span-1 space-y-6 bg-sidebar border p-5 rounded-xl h-fit">
+        <div>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-secondary mb-3">Tựa Game</h3>
+          <div class="space-y-2.5 text-sm">
+            <label class="flex items-center justify-between cursor-pointer">
+              <div class="flex items-center gap-2.5">
+                <input type="checkbox" value="CS2" checked onchange="handleFilter()" class="game-checkbox rounded w-4 h-4 cursor-pointer">
+                <span class="text-primary">CS2</span>
+              </div>
+              <span class="text-xs text-secondary">8</span>
+            </label>
+            <label class="flex items-center justify-between cursor-pointer">
+              <div class="flex items-center gap-2.5">
+                <input type="checkbox" value="Valorant" checked onchange="handleFilter()" class="game-checkbox rounded w-4 h-4 cursor-pointer">
+                <span class="text-primary">Valorant</span>
+              </div>
+              <span class="text-xs text-secondary">2</span>
+            </label>
+            <label class="flex items-center justify-between cursor-pointer">
+              <div class="flex items-center gap-2.5">
+                <input type="checkbox" value="Khác" checked onchange="handleFilter()" class="game-checkbox rounded w-4 h-4 cursor-pointer">
+                <span class="text-primary">Khác</span>
+              </div>
+              <span class="text-xs text-secondary">2</span>
+            </label>
+          </div>
+        </div>
+
+        <hr class="border-gray-700/30" />
+
+        <div>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-secondary mb-3">Nhãn</h3>
+          <div class="space-y-2.5 text-sm">
+            <label class="flex items-center justify-between cursor-pointer">
+              <div class="flex items-center gap-2.5">
+                <input type="checkbox" value="Mới" onchange="handleFilter()" class="tag-checkbox rounded w-4 h-4 cursor-pointer">
+                <span class="text-primary">Mới</span>
+              </div>
+              <span class="text-xs text-secondary">6</span>
+            </label>
+            <label class="flex items-center justify-between cursor-pointer">
+              <div class="flex items-center gap-2.5">
+                <input type="checkbox" value="Bán chạy" onchange="handleFilter()" class="tag-checkbox rounded w-4 h-4 cursor-pointer">
+                <span class="text-primary">Bán chạy</span>
+              </div>
+              <span class="text-xs text-secondary">2</span>
+            </label>
+            <label class="flex items-center justify-between cursor-pointer">
+              <div class="flex items-center gap-2.5">
+                <input type="checkbox" value="Cao cấp" onchange="handleFilter()" class="tag-checkbox rounded w-4 h-4 cursor-pointer">
+                <span class="text-primary">Cao cấp</span>
+              </div>
+              <span class="text-xs text-secondary">2</span>
+            </label>
+          </div>
+        </div>
+
+        <hr class="border-gray-700/30" />
+
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-secondary">GIÁ TỐI ĐA:</span>
+            <span id="price-display" class="text-sm font-bold text-primary">2.000.000đ</span>
+          </div>
+          <input 
+            type="range" 
+            id="price-range" 
+            min="200000" 
+            max="2000000" 
+            step="50000" 
+            value="2000000" 
+            oninput="handleFilter()"
+            class="w-full h-1.5 bg-gray-600 rounded-lg appearance-none cursor-pointer"
+          />
+        </div>
+
+        <div class="pt-2">
+          <button onclick="resetFilters()" class="text-xs text-secondary underline hover:text-primary transition-colors cursor-pointer">
+            Xóa bộ lọc
+          </button>
+        </div>
+      </aside>
+
+      <!-- PRODUCT AREA -->
+      <section class="lg:col-span-3">
+        <div class="flex items-center justify-between mb-6">
+          <div class="font-bold text-lg text-primary">
+            <span id="product-count">12</span> sản phẩm
+          </div>
+          <select id="sort-select" onchange="handleFilter()" class="bg-card border text-sm text-primary rounded-lg px-3 py-2 focus:outline-none cursor-pointer">
+            <option value="popular">Phổ biến</option>
+            <option value="low-high">Giá: Thấp đến Cao</option>
+            <option value="high-low">Giá: Cao đến Thấp</option>
+          </select>
+        </div>
+
+        <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <!-- Rendered via JS -->
+        </div>
+      </section>
+
+    </div>
+
+    <!-- VIEW 2: PRODUCT DETAIL VIEW -->
+    <div id="product-detail-view" class="hidden">
+      <!-- Dynamic PDP Rendered Here -->
+    </div>
+
+    <!-- VIEW 3: SHOPPING CART & CHECKOUT VIEW -->
+    <div id="cart-view" class="hidden space-y-8">
+      <!-- Top Bar -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-700/30 pb-5">
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-black text-primary flex items-center gap-3">
+            <span>🛒 Giỏ hàng của bạn</span>
+            <span id="cart-header-badge" class="text-xs font-bold bg-blue-600 text-white px-3 py-1 rounded-full">0 sản phẩm</span>
+          </h1>
+          <p class="text-xs text-secondary mt-1">Kiểm tra thông số găng tay và hoàn tất thông tin đặt hàng.</p>
+        </div>
+        <button onclick="showProductList()" class="inline-flex items-center gap-2 text-sm font-medium text-secondary hover:text-primary transition-colors bg-card border px-4 py-2.5 rounded-xl cursor-pointer w-fit">
+          <span>← Tiếp tục mua sắm</span>
+        </button>
+      </div>
+
+      <!-- Dynamic Cart Content (Empty State OR Cart Items + Checkout Summary) -->
+      <div id="cart-content-area"></div>
+    </div>
+
+    <!-- VIEW 4: FAQ & CONTACT US VIEW -->
+    <div id="faq-contact-view" class="hidden space-y-16 py-6">
+      
+      <!-- KHỐI 1: LIÊN HỆ VỚI CHÚNG TÔI -->
+      <section class="max-w-5xl mx-auto">
+        <div class="text-center space-y-2 mb-10">
+          <span class="text-xs font-bold uppercase tracking-[0.2em] text-blue-500 block">HỖ TRỢ</span>
+          <h1 class="text-3xl sm:text-4xl font-black uppercase tracking-tight text-primary">
+            LIÊN HỆ <span class="text-blue-600">CHÚNG TÔI</span>
+          </h1>
+          <p class="text-sm text-secondary pt-1">
+            Bạn có thắc mắc về đơn hàng, mẫu găng tay hay vận chuyển? Hãy gửi tin nhắn cho chúng tôi.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          <!-- Cột trái (5 cột): 3 thẻ thông tin -->
+          <div class="lg:col-span-5 space-y-4">
+            
+            <!-- Thẻ 1: Phản hồi nhanh chóng -->
+            <div class="bg-card border rounded-xl p-5 flex items-start gap-4 transition-all hover:border-blue-500/50">
+              <div class="text-blue-500 mt-0.5 flex-shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-primary">Phản hồi nhanh chóng</h3>
+                <p class="text-xs text-secondary mt-1">Chúng tôi trả lời trong vòng 24 giờ, từ Thứ Hai đến Thứ Sáu.</p>
+              </div>
+            </div>
+
+            <!-- Thẻ 2: Thắc mắc về đơn hàng -->
+            <div class="bg-card border rounded-xl p-5 flex items-start gap-4 transition-all hover:border-blue-500/50">
+              <div class="text-blue-500 mt-0.5 flex-shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-primary">Thắc mắc về đơn hàng</h3>
+                <p class="text-xs text-secondary mt-1">Nhập kèm mã đơn hàng của bạn để được hỗ trợ nhanh hơn.</p>
+              </div>
+            </div>
+
+            <!-- Thẻ 3: Đổi trả trong 7 ngày -->
+            <div class="bg-card border rounded-xl p-5 flex items-start gap-4 transition-all hover:border-blue-500/50">
+              <div class="text-blue-500 mt-0.5 flex-shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-primary">Đổi trả trong 7 ngày</h3>
+                <p class="text-xs text-secondary mt-1">Chưa hài lòng? Chúng tôi sẽ hướng dẫn bạn quy trình đổi trả.</p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Cột phải (7 cột): Form gửi tin nhắn -->
+          <form onsubmit="submitContactForm(event)" class="lg:col-span-7 space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-primary mb-1.5">Họ và tên *</label>
+                <input 
+                  type="text" 
+                  id="contact-name"
+                  required 
+                  class="w-full bg-card border rounded-lg px-4 py-3 text-sm text-primary focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-primary mb-1.5">Email *</label>
+                <input 
+                  type="email" 
+                  id="contact-email"
+                  required 
+                  class="w-full bg-card border rounded-lg px-4 py-3 text-sm text-primary focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-primary mb-1.5">Mã đơn hàng (tùy chọn)</label>
+              <input 
+                type="text" 
+                id="contact-order"
+                placeholder="#GV-1001" 
+                class="w-full bg-card border rounded-lg px-4 py-3 text-sm text-primary placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              />
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-primary mb-1.5">Nội dung tin nhắn *</label>
+              <textarea 
+                id="contact-message"
+                rows="5" 
+                required 
+                class="w-full bg-card border rounded-lg px-4 py-3 text-sm text-primary focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              ></textarea>
+            </div>
+
+            <button 
+              type="submit" 
+              class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black text-xs sm:text-sm uppercase tracking-wider py-4 rounded-lg transition-all shadow-lg cursor-pointer"
+            >
+              GỬI TIN NHẮN
+            </button>
+          </form>
+
+        </div>
+      </section>
+
+      <hr class="border-gray-700/20 max-w-5xl mx-auto" />
+
+      <!-- KHỐI 2: CÂU HỎI THƯỜNG GẶP (FAQ) -->
+      <section class="max-w-4xl mx-auto space-y-8">
+        <div class="text-center space-y-2">
+          <span class="text-xs font-bold uppercase tracking-[0.2em] text-blue-500 block">GIẢI ĐÁP THẮC MẮC</span>
+          <h2 class="text-2xl sm:text-3xl font-black uppercase tracking-tight text-primary">
+            CÂU HỎI <span class="text-blue-600">THƯỜNG GẶP (FAQ)</span>
+          </h2>
+        </div>
+
+        <div class="space-y-6">
+          <!-- Nhóm 1: Vận chuyển & Nhận hàng -->
+          <div class="space-y-3">
+            <h3 class="text-xs font-black uppercase tracking-wider text-blue-500 px-1">1. Vận chuyển & Nhận hàng</h3>
+            
+            <div class="bg-card border rounded-xl p-5 space-y-2">
+              <h4 class="text-sm font-bold text-primary">Bao lâu tôi sẽ nhận được hàng sau khi đặt?</h4>
+              <p class="text-xs sm:text-sm text-secondary leading-relaxed">
+                Sau khi bạn đặt hàng thành công trên website, đội ngũ GLOVES VAULT sẽ liên hệ xác nhận đơn hàng trong vòng <strong>15 phút</strong>. Vì toàn bộ sản phẩm là hàng Order nhập khẩu trực tiếp từ nước ngoài, thời gian giao hàng dự kiến đến tay bạn là từ <strong>14 – 21 ngày</strong> (kể từ thời điểm đơn hàng được xác nhận thanh toán).
+              </p>
+            </div>
+
+            <div class="bg-card border rounded-xl p-5 space-y-2">
+              <h4 class="text-sm font-bold text-primary">Phí vận chuyển được tính như thế nào?</h4>
+              <p class="text-xs sm:text-sm text-secondary leading-relaxed">
+                GLOVES VAULT <strong>miễn phí vận chuyển toàn quốc (0đ)</strong> cho tất cả các đơn hàng từ <strong>1.000.000đ</strong> trở lên (mua từ 1 đôi găng tay bất kỳ trên shop là bạn đã được Freeship). Với các đơn phụ kiện nhỏ dưới 1.000.000đ, phí ship đồng giá là 35.000đ.
+              </p>
+            </div>
+          </div>
+
+          <!-- Nhóm 2: Sản phẩm & Kích cỡ -->
+          <div class="space-y-3">
+            <h3 class="text-xs font-black uppercase tracking-wider text-blue-500 px-1">2. Sản phẩm & Kích cỡ (Sizing)</h3>
+
+            <div class="bg-card border rounded-xl p-5 space-y-2">
+              <h4 class="text-sm font-bold text-primary">Găng tay ngoài đời thực giống trong game CS2 đến mức nào?</h4>
+              <p class="text-xs sm:text-sm text-secondary leading-relaxed">
+                Các mẫu găng tay tại GLOVES VAULT (Pandora's Box, Amphibious, Hedge Maze, Crimson Kimono, Vice, POW, Spearmint, Nocts...) được gia công theo tỷ lệ 1:1 so với nguyên mẫu in-game: từ chất liệu vải lưới dập nổi 3D (Concavo-Convex Fabric), gù nhựa cứng bảo vệ khớp tay ở dòng Moto Gloves, cho đến họa tiết ở lòng bàn tay và tag cao su ở cổ tay.
+              </p>
+            </div>
+
+            <div class="bg-card border rounded-xl p-5 space-y-2">
+              <h4 class="text-sm font-bold text-primary">Sản phẩm chỉ có "One Size (Tiêu chuẩn)", vậy tay tôi đeo có vừa không?</h4>
+              <p class="text-xs sm:text-sm text-secondary leading-relaxed">
+                Găng tay được thiết kế theo form <strong>One Size (tương đương size L tiêu chuẩn quốc tế)</strong> kết hợp chất liệu sợi tổng hợp co giãn 4 chiều và đai dán Velcro (nhám dính) ở cổ tay. Thiết kế này ôm vừa vặn cho chu vi lòng bàn tay từ <strong>18cm – 23cm</strong>.
+              </p>
+            </div>
+
+            <div class="bg-card border rounded-xl p-5 space-y-2">
+              <h4 class="text-sm font-bold text-primary">Găng tay này dùng để làm gì? Có đeo chạy xe máy được không?</h4>
+              <p class="text-xs sm:text-sm text-secondary leading-relaxed">
+                Ngoài việc dùng để <strong>trưng bày góc gaming (Setup), chụp ảnh, Cosplay</strong>, toàn bộ găng tay đều được may gia cố 2 lớp với đệm lòng bàn tay chống trượt và gù bảo vệ, hoàn toàn sử dụng thực tế rất tốt khi <strong>chạy xe máy, mô tô phân khối lớn, đạp xe hoặc tập luyện thể thao</strong>.
+              </p>
+            </div>
+
+            <div class="bg-card border rounded-xl p-5 space-y-2">
+              <h4 class="text-sm font-bold text-primary">Làm sao để vệ sinh và bảo quản găng tay bền màu?</h4>
+              <ul class="list-disc pl-5 text-xs sm:text-sm text-secondary space-y-1 leading-relaxed">
+                <li>Không giặt bằng máy giặt và không dùng thuốc tẩy mạnh.</li>
+                <li>Nên lau nhẹ bằng khăn ẩm hoặc giặt tay nhẹ nhàng với sữa tắm/xà phòng pha loãng, sau đó phơi ở nơi thoáng mát, tránh ánh nắng mặt trời trực tiếp.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Nhóm 3: Thanh toán & Đổi trả -->
+          <div class="space-y-3">
+            <h3 class="text-xs font-black uppercase tracking-wider text-blue-500 px-1">3. Thanh toán & Đổi trả</h3>
+
+            <div class="bg-card border rounded-xl p-5 space-y-2">
+              <h4 class="text-sm font-bold text-primary">Shop hỗ trợ những hình thức thanh toán nào?</h4>
+              <p class="text-xs sm:text-sm text-secondary leading-relaxed">
+                Vì đây là mặt hàng Order nhập khẩu trực tiếp từ nước ngoài, GLOVES VAULT chỉ nhận <strong>thanh toán chuyển khoản trước 100% giá trị đơn hàng</strong> thông qua 3 phương thức: <strong>Chuyển khoản Ngân hàng (Sacombank)</strong>, <strong>Ví MoMo</strong> và <strong>PayPal</strong>.
+              </p>
+            </div>
+
+            <div class="bg-card border rounded-xl p-5 space-y-2">
+              <h4 class="text-sm font-bold text-primary">Chính sách đổi trả trong 7 ngày áp dụng như thế nào?</h4>
+              <p class="text-xs sm:text-sm text-secondary leading-relaxed">
+                GLOVES VAULT hỗ trợ <strong>đổi mới 1-1 hoặc hoàn tiền 100% miễn phí trong vòng 7 ngày</strong> kể từ khi nhận hàng nếu sản phẩm có lỗi từ nhà sản xuất (bung chỉ, rách lưới, lem màu, giao sai mẫu đã đặt) với điều kiện găng tay chưa qua sử dụng, còn nguyên tem mác và có video quay lại quá trình mở hộp (unbox).
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- CUSTOMER PHOTO LIGHTBOX MODAL -->
+  <div id="customer-lightbox-modal" onclick="closeCustomerLightbox(event)" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/85 backdrop-blur-md p-4">
+    <div class="relative max-w-3xl w-full bg-card border border-gray-700 rounded-3xl p-4 sm:p-6 shadow-2xl flex flex-col items-center space-y-4" onclick="event.stopPropagation()">
+      <div class="w-full flex items-center justify-between border-b border-gray-700/30 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-blue-500">Hình ảnh thực tế từ khách hàng</span>
+          <span id="lightbox-counter" class="text-xs font-semibold text-secondary bg-sidebar border px-2.5 py-0.5 rounded-full">1 / 1</span>
+        </div>
+        <button onclick="closeCustomerLightbox()" class="w-8 h-8 rounded-full bg-sidebar border text-primary hover:bg-red-500 hover:text-white flex items-center justify-center transition-colors cursor-pointer font-bold">
+          ✕
+        </button>
+      </div>
+
+      <div class="relative w-full h-80 sm:h-[460px] flex items-center justify-center bg-img-container rounded-2xl overflow-hidden border p-2">
+        <button onclick="stepCustomerLightbox(-1)" class="absolute left-3 z-10 w-10 h-10 rounded-full bg-black/65 hover:bg-black text-white flex items-center justify-center text-xl font-bold shadow-lg transition-transform hover:scale-105 cursor-pointer">
+          ‹
+        </button>
+
+        <img 
+          id="lightbox-main-img" 
+          src="" 
+          alt="Customer feedback large" 
+          onerror="handleSmartImgError(this, currentOpenProductId, 'cust', 0)"
+          class="max-h-full max-w-full object-contain rounded-xl transition-all duration-200" 
+        />
+
+        <button onclick="stepCustomerLightbox(1)" class="absolute right-3 z-10 w-10 h-10 rounded-full bg-black/65 hover:bg-black text-white flex items-center justify-center text-xl font-bold shadow-lg transition-transform hover:scale-105 cursor-pointer">
+          ›
+        </button>
+      </div>
+
+      <div id="lightbox-thumbs-row" class="flex flex-wrap items-center justify-center gap-2 pt-1 max-h-28 overflow-y-auto"></div>
+    </div>
+  </div>
+
+  <!-- ORDER CONFIRMATION MODAL -->
+  <div id="order-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4 overflow-y-auto">
+    <div class="bg-card border rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-5 shadow-2xl text-primary relative my-8">
+      <div class="w-14 h-14 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto text-2xl font-bold">
+        ✓
+      </div>
+      <div class="text-center space-y-1.5">
+        <span class="text-xs font-bold uppercase tracking-widest text-blue-500">ĐẶT HÀNG THÀNH CÔNG</span>
+        <h3 class="text-xl sm:text-2xl font-black text-primary">Cảm ơn bạn đã mua sắm tại GLOVES VAULT!</h3>
+        <p class="text-xs text-secondary leading-relaxed">
+          Đơn hàng đã được gửi trực tiếp về hệ thống của GLOVES VAULT. Vui lòng hoàn tất thanh toán theo mã QR hoặc liên kết bên dưới.
+        </p>
+      </div>
+
+      <div id="order-modal-summary" class="bg-sidebar border rounded-2xl p-4 space-y-3 text-xs">
+        <!-- Populated via JS -->
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 pt-1">
+        <button onclick="closeOrderModal(); showProductList();" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 px-6 rounded-xl transition-all cursor-pointer text-sm">
+          Tiếp tục khám phá cửa hàng
+        </button>
+        <button onclick="closeOrderModal(); showHome3DView();" class="bg-sidebar border hover:opacity-80 text-primary font-semibold py-3.5 px-5 rounded-xl transition-all cursor-pointer text-sm">
+          Về Trang chủ
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CUSTOM NOTIFICATION TOAST (NO ALERT) -->
+  <div id="toast-box" class="fixed bottom-24 right-6 z-50 hidden bg-gray-900 text-white text-xs font-bold px-4 py-3 rounded-xl shadow-xl border border-gray-700 transition-all"></div>
+
+  <!-- FLOATING CONTACT BUTTONS (DISCORD & ZALO) -->
+  <div class="fixed bottom-6 right-6 z-50 flex items-center gap-3">
+    <a href="https://discord.gg/nuftMsrde" target="_blank" rel="noopener noreferrer" title="Tham gia Discord" class="w-12 h-12 bg-[#5865F2] hover:bg-[#4752C4] text-white rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-110">
+      <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515a.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0a12.64 12.64 0 0 0-.617-1.25a.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057a19.9 19.9 0 0 0 5.993 3.03a.078.078 0 0 0 .084-.028a14.09 14.09 0 0 0 1.226-1.994a.076.076 0 0 0-.041-.106a13.107 13.107 0 0 1-1.872-.892a.077.077 0 0 1-.008-.128a10.2 10.2 0 0 0 .372-.292a.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127a12.299 12.299 0 0 1-1.873.892a.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028a19.839 19.839 0 0 0 6.002-3.03a.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.956-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419c0-1.333.955-2.419 2.157-2.419c1.21 0 2.176 1.096 2.157 2.42c0 1.333-.946 2.418-2.157 2.418z"/></svg>
+    </a>
+    <a href="https://zalo.me/0901234567" target="_blank" rel="noopener noreferrer" title="Liên hệ qua Zalo" class="w-12 h-12 bg-[#0068FF] hover:bg-[#0052cc] text-white rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-110">
+      <svg class="w-7 h-7" viewBox="0 0 48 48" fill="none">
+        <path d="M24 4C12.954 4 4 12.283 4 22.5C4 28.18 6.768 33.257 11.127 36.652C10.742 38.995 9.696 41.874 9.615 42.092C9.429 42.593 9.873 43.085 10.395 42.946C13.064 42.235 16.516 40.793 18.232 39.967C20.065 40.638 22.001 41 24 41C35.046 41 44 32.717 44 22.5C44 12.283 35.046 4 24 4Z" fill="white"/>
+        <text x="24" y="26.5" text-anchor="middle" fill="#0068FF" font-size="12" font-weight="900" font-family="Arial, sans-serif">Zalo</text>
+      </svg>
+    </a>
+  </div>
+
+  <!-- RICH FOOTER DESIGN -->
+  <footer class="bg-[#16171c] border-t border-gray-800 pt-12 pb-8 mt-16 text-gray-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- TOP SECTION: SUBSCRIBE & LINKS GRID -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 pb-12 border-b border-gray-800">
+        
+        <!-- LEFT 5 COLUMNS: SUBSCRIBE & SOCIAL -->
+        <div class="lg:col-span-5 space-y-6">
+          <h3 class="text-xs font-bold uppercase tracking-widest text-gray-100">SUBSCRIBE TO OUR EMAILS</h3>
+          
+          <form onsubmit="event.preventDefault(); showToast('Cảm ơn bạn đã đăng ký nhận thông tin!');" class="flex items-center max-w-md">
+            <div class="relative w-full">
+              <input 
+                type="email" 
+                placeholder="Email Address" 
+                required
+                class="w-full bg-white text-gray-900 placeholder-gray-500 rounded-full py-3 pl-5 pr-28 text-sm focus:outline-none font-medium"
+              />
+              <button 
+                type="submit" 
+                class="absolute right-1 top-1 bottom-1 bg-gray-900 text-white hover:bg-black font-bold text-xs uppercase tracking-wider px-5 rounded-full transition-colors cursor-pointer"
+              >
+                SIGN UP
+              </button>
+            </div>
+          </form>
+
+          <div class="pt-2">
+            <h4 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">FOLLOW THE FLOCK</h4>
+            <div class="flex items-center gap-3">
+              <!-- Instagram -->
+              <a href="#" class="w-9 h-9 rounded-full border border-gray-600 flex items-center justify-center hover:bg-white hover:text-gray-900 transition-all">
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+              </a>
+              <!-- Facebook -->
+              <a href="https://www.facebook.com/profile.php?id=61594759448540" target="_blank" class="w-9 h-9 rounded-full border border-gray-600 flex items-center justify-center hover:bg-white hover:text-gray-900 transition-all">
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              </a>
+              <!-- X (Twitter) -->
+              <a href="#" class="w-9 h-9 rounded-full border border-gray-600 flex items-center justify-center hover:bg-white hover:text-gray-900 transition-all">
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              </a>
+              <!-- TikTok -->
+              <a href="#" class="w-9 h-9 rounded-full border border-gray-600 flex items-center justify-center hover:bg-white hover:text-gray-900 transition-all">
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.98-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.82.57-1.32 1.55-1.3 2.55.01.8.41 1.58 1.05 2.06.81.6 1.9.74 2.82.38 1.05-.39 1.78-1.41 1.83-2.53.05-2.82.02-5.64.02-8.46V.02z"/></svg>
+              </a>
+              <!-- YouTube -->
+              <a href="#" class="w-9 h-9 rounded-full border border-gray-600 flex items-center justify-center hover:bg-white hover:text-gray-900 transition-all">
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT 7 COLUMNS: 3 LINK COLUMNS (HELP, SHOP, COMPANY) -->
+        <div class="lg:col-span-7 grid grid-cols-2 md:grid-cols-3 gap-8 text-xs">
+          
+          <!-- HELP -->
+          <div class="space-y-3">
+            <h4 class="font-bold uppercase tracking-wider text-gray-100">HELP</h4>
+            <ul class="space-y-2.5 text-gray-400">
+              <li><a href="mailto:help@glovesvault.vn" class="hover:text-white transition-colors">help@glovesvault.vn</a></li>
+              <li><a href="#" onclick="showFaqContactView(); return false;" class="hover:text-white transition-colors">FAQ / Contact Us</a></li>
+              <li><a href="#" onclick="showFaqContactView(); return false;" class="hover:text-white transition-colors">Returns / Exchanges</a></li>
+            </ul>
+          </div>
+
+          <!-- SHOP -->
+          <div class="space-y-3">
+            <h4 class="font-bold uppercase tracking-wider text-gray-100">SHOP</h4>
+            <ul class="space-y-2.5 text-gray-400">
+              <li><a href="#" onclick="showProductList(); return false;" class="hover:text-white transition-colors">CS2 Gloves</a></li>
+              <li><a href="#" onclick="showProductList(); return false;" class="hover:text-white transition-colors">Valorant Gloves</a></li>
+            </ul>
+          </div>
+
+          <!-- COMPANY -->
+          <div class="space-y-3">
+            <h4 class="font-bold uppercase tracking-wider text-gray-100">COMPANY</h4>
+            <ul class="space-y-2.5 text-gray-400">
+              <li><a href="#" class="hover:text-white transition-colors">Our Story</a></li>
+              <li><a href="#" class="hover:text-white transition-colors">Our Materials</a></li>
+              <li><a href="#" class="hover:text-white transition-colors">Materials & Making</a></li>
+              <li><a href="#" onclick="showFaqContactView(); return false;" class="hover:text-white transition-colors">Glove Care</a></li>
+            </ul>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- BOTTOM BAR: COPYRIGHT & LEGAL POLICIES -->
+      <div class="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-500">
+        
+        <div class="flex items-center gap-6">
+          <div class="flex items-center gap-1.5 cursor-pointer hover:text-gray-300">
+            <span class="font-bold text-gray-300">VN</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          </div>
+          <span>© 2026 GLOVES VAULT LLC. All Rights Reserved</span>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-gray-400">
+          <a href="#" onclick="showFaqContactView(); return false;" class="hover:text-white transition-colors">Refund policy</a>
+          <a href="#" class="hover:text-white transition-colors">Privacy policy</a>
+          <a href="#" class="hover:text-white transition-colors">Terms of service</a>
+          <a href="#" onclick="showFaqContactView(); return false;" class="hover:text-white transition-colors">Shipping policy</a>
+        </div>
+
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // 1. Webhook nhận thông báo ĐƠN HÀNG MỚI
+    const DISCORD_ORDER_WEBHOOK_URL = "https://discord.com/api/webhooks/1566622836544634941/w7UgR2pwi0pr-9iHz7CQPDvrwxna6SyxO_B2kUWd6Po4VYf-7cR-WCXF_gBOt_xqZLWK";
+
+    // 2. Webhook nhận tin nhắn LIÊN HỆ / HỖ TRỢ sang kênh riêng
+    const DISCORD_CONTACT_WEBHOOK_URL = "https://discord.com/api/webhooks/1566794715775631491/vtGXMg_OPu7QM9j0BNPVYNk6wGWPEesBONN4aW-NBnZu1KmafNQflLI1bHh2DipPSKKT";
+
+    const PAYPAL_PAYMENT_URL = "https://www.paypal.com/ncp/payment/XZBH63A9PL6SG";
+    const BANK_QR_IMAGE_FILE = "b4c30a9f-eed4-4791-afa5-32e8b39b3c63.jpg";
+    const MOMO_QR_IMAGE_FILE = "ce675a9e-c7df-4da4-a411-3003c0893f0f.jpg";
+
+    const HERO_VIDEO_CANDIDATES = [
+      "gemini_generated_video_0d8e710f_gwr_video_mvp.mp4",
+      "gemini_generated_video_0d8e710f.mp4",
+      "pandora_3d.mp4"
+    ];
+
+    function copyTextToClipboard(text, label) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast('📋 Đã sao chép ' + label + ': ' + text);
+        }).catch(() => {
+          showToast('📋 ' + label + ': ' + text);
+        });
+      } else {
+        showToast('📋 ' + label + ': ' + text);
+      }
+    }
+
+    // Tạo widget hiển thị thẻ QR thiết kế riêng cho từng phương thức thanh toán
+    function getPaymentDetailWidgetHTML(method, amount, orderNote) {
+      const encodedNote = encodeURIComponent(orderNote || 'GLOVES VAULT ORDER');
+      const vietQrFallbackUrl = `https://img.vietqr.io/image/STB-040100313024-compact2.png?amount=${amount || 0}&addInfo=${encodedNote}&accountName=NGUYEN%20THANH%20HUNG`;
+      const momoQrFallbackUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent('00020101021138630010A000000727013300069710250119PSP26003184000004140208QRIBFTTA53037045802VN6304')}`;
+
+      if (method === 'BANK') {
+        return `
+          <div class="mt-3 rounded-2xl overflow-hidden border border-blue-500/40 bg-gradient-to-b from-[#0a2e5c] to-[#071d3b] text-white shadow-xl">
+            <div class="bg-[#00529b] px-4 py-2.5 flex items-center justify-between border-b border-white/10">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="font-black text-xs tracking-wider uppercase">SACOMBANK · VIETQR 24/7</span>
+              </div>
+              <span class="text-[10px] font-bold bg-white/15 px-2 py-0.5 rounded-full">napas 247</span>
+            </div>
+
+            <div class="p-4 flex flex-col items-center space-y-3">
+              <div class="bg-white p-2.5 rounded-2xl shadow-lg flex flex-col items-center">
+                <div class="qr-crop-box">
+                  <img 
+                    src="${BANK_QR_IMAGE_FILE}" 
+                    alt="Sacombank VietQR" 
+                    class="qr-crop-bank-img"
+                    onerror="this.className='w-full h-full object-contain'; this.src='${vietQrFallbackUrl}';"
+                  />
+                </div>
+                <div class="flex items-center gap-3 mt-1.5 pt-1 border-t border-gray-100 w-full justify-center text-[10px] font-extrabold text-blue-900">
+                  <span>SACOMBANK</span>
+                  <span>•</span>
+                  <span class="text-red-600">VIETQR</span>
+                  <span>•</span>
+                  <span class="text-emerald-600">napas 247</span>
+                </div>
+              </div>
+
+              <div class="w-full bg-black/25 rounded-xl p-3 space-y-1.5 text-xs border border-white/10">
+                <div class="flex justify-between items-center">
+                  <span class="text-blue-200">Ngân hàng:</span>
+                  <span class="font-bold">Sacombank</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-blue-200">Chủ tài khoản:</span>
+                  <span class="font-bold uppercase">NGUYEN THANH HUNG</span>
+                </div>
+                <div class="flex justify-between items-center pt-1 border-t border-white/10">
+                  <span class="text-blue-200">Số tài khoản:</span>
+                  <div class="flex items-center gap-2">
+                    <span class="font-black text-amber-300 tracking-wider">040100313024</span>
+                    <button type="button" onclick="copyTextToClipboard('040100313024', 'Số tài khoản Sacombank')" class="bg-white/15 hover:bg-white/25 text-white text-[10px] font-bold px-2 py-0.5 rounded cursor-pointer transition-colors">
+                      Sao chép
+                    </button>
+                  </div>
+                </div>
+                ${amount ? `
+                <div class="flex justify-between items-center pt-1 border-t border-white/10">
+                  <span class="text-blue-200">Số tiền cần chuyển:</span>
+                  <span class="font-black text-emerald-400 text-sm">${formatMoney(amount)}</span>
+                </div>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (method === 'MOMO') {
+        return `
+          <div class="mt-3 rounded-2xl overflow-hidden border border-pink-500/40 bg-gradient-to-b from-[#7a004b] to-[#420028] text-white shadow-xl">
+            <div class="bg-[#a50064] px-4 py-2.5 flex items-center justify-between border-b border-white/10">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-pink-300 animate-pulse"></span>
+                <span class="font-black text-xs tracking-wider uppercase">VÍ ĐIỆN TỬ MOMO · VIETQR</span>
+              </div>
+              <span class="text-[10px] font-bold bg-white/15 px-2 py-0.5 rounded-full">Quét mã QR</span>
+            </div>
+
+            <div class="p-4 flex flex-col items-center space-y-3">
+              <div class="bg-white p-2.5 rounded-2xl shadow-lg flex flex-col items-center">
+                <div class="qr-crop-box">
+                  <img 
+                    src="${MOMO_QR_IMAGE_FILE}" 
+                    alt="MoMo VietQR" 
+                    class="qr-crop-momo-img"
+                    onerror="this.className='w-full h-full object-contain p-2'; this.src='${momoQrFallbackUrl}';"
+                  />
+                </div>
+                <div class="flex items-center gap-3 mt-1.5 pt-1 border-t border-gray-100 w-full justify-center text-[10px] font-extrabold text-[#a50064]">
+                  <span>MoMo</span>
+                  <span>•</span>
+                  <span class="text-red-600">VIETQR</span>
+                  <span>•</span>
+                  <span class="text-blue-700">napas 247</span>
+                </div>
+              </div>
+
+              <div class="w-full bg-black/25 rounded-xl p-3 space-y-1.5 text-xs border border-white/10">
+                <div class="flex justify-between items-center">
+                  <span class="text-pink-200">Ví điện tử:</span>
+                  <span class="font-bold">MoMo</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-pink-200">Người nhận:</span>
+                  <span class="font-bold uppercase">NGUYEN THANH HUNG</span>
+                </div>
+                <div class="flex justify-between items-center pt-1 border-t border-white/10">
+                  <span class="text-pink-200">Số tài khoản QR:</span>
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-black text-amber-300 text-[11px]">PSP2600318400000414</span>
+                    <button type="button" onclick="copyTextToClipboard('PSP2600318400000414', 'Mã nhận tiền MoMo')" class="bg-white/15 hover:bg-white/25 text-white text-[10px] font-bold px-2 py-0.5 rounded cursor-pointer transition-colors">
+                      Sao chép
+                    </button>
+                  </div>
+                </div>
+                ${amount ? `
+                <div class="flex justify-between items-center pt-1 border-t border-white/10">
+                  <span class="text-pink-200">Số tiền cần chuyển:</span>
+                  <span class="font-black text-emerald-400 text-sm">${formatMoney(amount)}</span>
+                </div>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // PAYPAL
+      return `
+        <div class="mt-3 rounded-2xl overflow-hidden border border-blue-400/40 bg-gradient-to-b from-[#003087] to-[#001c52] text-white shadow-xl">
+          <div class="bg-[#0070ba] px-4 py-2.5 flex items-center justify-between border-b border-white/10">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-cyan-300 animate-pulse"></span>
+              <span class="font-black text-xs tracking-wider uppercase">CỔNG THANH TOÁN QUỐC TẾ PAYPAL</span>
+            </div>
+            <span class="text-[10px] font-bold bg-white/15 px-2 py-0.5 rounded-full">Bảo mật SSL</span>
+          </div>
+
+          <div class="p-4 space-y-3 text-center">
+            <p class="text-xs text-blue-100 leading-relaxed">
+              Nhấn vào nút bên dưới để mở cổng thanh toán trực tuyến <strong>PayPal</strong> chính thức của GLOVES VAULT:
+            </p>
+            <a 
+              href="${PAYPAL_PAYMENT_URL}" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="w-full inline-flex items-center justify-center gap-2 bg-[#ffc439] hover:bg-[#f4b41a] text-[#003087] font-black text-xs uppercase tracking-wider py-3.5 px-5 rounded-xl shadow-md transition-transform hover:scale-[1.01]"
+            >
+              <span>💳 Mở trang thanh toán PayPal</span>
+              <span>↗</span>
+            </a>
+            <div class="text-[11px] text-blue-200 break-all bg-black/25 p-2 rounded-lg border border-white/10">
+              Link: <a href="${PAYPAL_PAYMENT_URL}" target="_blank" class="underline hover:text-white">${PAYPAL_PAYMENT_URL}</a>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function makeCutoutTransparent(imgEl) {
+      if (!imgEl || imgEl.dataset.cutoutDone === 'true') return;
+      imgEl.dataset.cutoutDone = 'true';
+      try {
+        const w = imgEl.naturalWidth;
+        const h = imgEl.naturalHeight;
+        if (!w || !h) return;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(imgEl, 0, 0);
+        const imgData = ctx.getImageData(0, 0, w, h);
+        const data = imgData.data;
+
+        const r0 = data[0], g0 = data[1], b0 = data[2];
+        const isBlackBg = (r0 < 25 && g0 < 25 && b0 < 25);
+        const isWhiteBg = (r0 > 238 && g0 > 238 && b0 > 238);
+        if (!isBlackBg && !isWhiteBg) return;
+
+        const visited = new Uint8Array(w * h);
+        const queue = [];
+
+        const pushIfBg = (x, y) => {
+          if (x < 0 || x >= w || y < 0 || y >= h) return;
+          const idx = y * w + x;
+          if (visited[idx]) return;
+          const p = idx * 4;
+          const r = data[p], g = data[p + 1], b = data[p + 2];
+          const match = isBlackBg
+            ? (r < 28 && g < 28 && b < 28)
+            : (r > 235 && g > 235 && b > 235);
+          if (match) {
+            visited[idx] = 1;
+            queue.push(idx);
+          }
+        };
+
+        for (let x = 0; x < w; x++) { pushIfBg(x, 0); pushIfBg(x, h - 1); }
+        for (let y = 0; y < h; y++) { pushIfBg(0, y); pushIfBg(w - 1, y); }
+
+        while (queue.length > 0) {
+          const curr = queue.pop();
+          data[curr * 4 + 3] = 0;
+          const cx = curr % w;
+          const cy = (curr - cx) / w;
+          pushIfBg(cx + 1, cy);
+          pushIfBg(cx - 1, cy);
+          pushIfBg(cx, cy + 1);
+          pushIfBg(cx, cy - 1);
+        }
+
+        ctx.putImageData(imgData, 0, 0);
+        const dataUrl = canvas.toDataURL('image/png');
+        if (dataUrl && dataUrl.startsWith('data:image/png')) {
+          imgEl.src = dataUrl;
+        }
+      } catch (e) {
+        // Giữ nguyên ảnh gốc nếu chạy trực tiếp từ ổ cứng bị chặn Canvas CORS
+      }
+    }
+
+    function handleHeroVideoError(videoEl) {
+      const step = parseInt(videoEl.dataset.retryStep || '0', 10);
+      if (step < HERO_VIDEO_CANDIDATES.length) {
+        videoEl.dataset.retryStep = String(step + 1);
+        videoEl.src = HERO_VIDEO_CANDIDATES[step];
+        videoEl.load();
+        videoEl.play().catch(() => {});
+        return;
+      }
+      videoEl.classList.add('hidden');
+      const fallbackStage = document.getElementById('interactive-3d-stage');
+      if (fallbackStage) {
+        fallbackStage.classList.remove('hidden');
+        fallbackStage.classList.add('flex');
+      }
+    }
+
+    function buildCandidatesList(baseNamesList) {
+      const exts = ['.jpg', '.webp', '.png', '.jpeg', '.JPG', '.WEBP', '.PNG', '.jpg.webp', '.webp.jpg', '.jpg.jpg'];
+      const folders = ['', 'images/', 'img/', 'assets/'];
+      const result = [];
+      const seen = new Set();
+
+      const addCandidate = (str) => {
+        if (!str || seen.has(str)) return;
+        seen.add(str);
+        result.push(str);
+      };
+
+      baseNamesList.forEach(raw => {
+        addCandidate(raw);
+        const baseNoExt = raw.replace(/\.(jpg|jpeg|webp|png)$/i, '');
+        const baseCleanNum = baseNoExt.replace(/_[0-9]+$/, '');
+
+        folders.forEach(folder => {
+          addCandidate(folder + raw);
+          exts.forEach(ext => {
+            addCandidate(folder + baseCleanNum + ext);
+            addCandidate(folder + baseNoExt + ext);
+            for (let k = 2; k <= 4; k++) {
+              addCandidate(folder + baseCleanNum + '_' + k + ext);
+            }
+          });
+        });
+      });
+
+      return result;
+    }
+
+    const productAltNames = {
+      1: {
+        main: buildCandidatesList([
+          "Pandora's Box - Main.jpg",
+          "Pandora's Box - Main.webp",
+          "Pandora's Box - Main.png",
+          "Pandora's Box - Main_3.jpg",
+          "Pandora's Box - Main_2.jpg"
+        ]),
+        thumbs: [
+          buildCandidatesList(["Pandora's Box - 2.jpg", "Pandora's Box - 2_3.jpg", "Pandora's Box - 2_2.jpg"]),
+          buildCandidatesList(["Pandora's Box - 3.jpg", "Pandora's Box - 3_3.jpg", "Pandora's Box - 3_2.jpg"]),
+          buildCandidatesList(["Pandora's Box - 4.jpg", "Pandora's Box - 4_3.jpg", "Pandora's Box - 4_2.jpg"])
+        ],
+        cust: [
+          buildCandidatesList(["Pandora's Box - Customer - 1.webp", "Pandora's Box - Customer - 1_3.webp", "Pandora's Box - Customer - 1_2.webp"]),
+          buildCandidatesList(["Pandora's Box - Customer - 2.webp", "Pandora's Box - Customer - 2_3.webp", "Pandora's Box - Customer - 2_2.webp"]),
+          buildCandidatesList(["Pandora's Box - Customer - 3.webp", "Pandora's Box - Customer - 3_3.webp", "Pandora's Box - Customer - 3_2.webp"]),
+          buildCandidatesList(["Pandora's Box - Customer - 4.webp", "Pandora's Box - Customer - 4_3.webp", "Pandora's Box - Customer - 4_2.webp"]),
+          buildCandidatesList(["Pandora's Box - Customer - 5.webp", "Pandora's Box - Customer - 5_3.webp", "Pandora's Box - Customer - 5_2.webp"]),
+          buildCandidatesList(["Pandora's Box - Customer - 6.webp", "Pandora's Box - Customer - 6_3.webp", "Pandora's Box - Customer - 6_2.webp"]),
+          buildCandidatesList(["Pandora's Box - Customer - 7.jpg", "Pandora's Box - Customer - 7_2.jpg"]),
+          buildCandidatesList(["Pandora's Box - Customer - 8.jpg", "Pandora's Box - Customer - 8_2.jpg"]),
+          buildCandidatesList(["Pandora's Box - Customer - 9.jpg", "Pandora's Box - Customer - 9_2.jpg"]),
+          buildCandidatesList(["Pandora's Box - Customer - 10.jpg", "Pandora's Box - Customer - 10_2.jpg"]),
+          buildCandidatesList(["Pandora's Box - Customer - 11.jpg", "Pandora's Box - Customer - 11_2.jpg"])
+        ]
+      },
+      2: {
+        main: buildCandidatesList([
+          "Amphibious - Main.jpg",
+          "Amphibious - Main.webp",
+          "Amphibious - Main.png",
+          "Amphibious - Main_3.jpg",
+          "Amphibious - Main_2.jpg"
+        ]),
+        thumbs: [
+          buildCandidatesList(["Amphibious - 2.webp", "Amphibious - 2_3.webp", "Amphibious - 2_2.webp"]),
+          buildCandidatesList(["Amphibious - 3.webp", "Amphibious - 3_3.webp", "Amphibious - 3_2.webp"])
+        ],
+        cust: []
+      },
+      3: {
+        main: buildCandidatesList([
+          "Hedge Maze - Main.jpg",
+          "Hedge Maze - Main.webp",
+          "Hedge Maze - Main.png",
+          "Hedge Maze - Main_2.jpg"
+        ]),
+        thumbs: [
+          buildCandidatesList(["Hedge Maze - 2.webp", "Hedge Maze - 2_2.webp"]),
+          buildCandidatesList(["Hedge Maze - 3.webp", "Hedge Maze - 3_2.webp"])
+        ],
+        cust: [
+          buildCandidatesList(["Hedge Maze - Customer - 1.jpg", "Hedge Maze - Customer - 1_2.jpg"]),
+          buildCandidatesList(["Hedge Maze - Customer - 2.webp", "Hedge Maze - Customer - 2_2.webp"])
+        ]
+      },
+      4: {
+        main: buildCandidatesList([
+          "Crimson Kimono - Main.jpg",
+          "Crimson Kimono - Main.webp",
+          "Crimson Kimono - Main.png"
+        ]),
+        thumbs: [
+          buildCandidatesList(["Crimson Kimono - 2.webp", "Crimson Kimono - 2.jpg", "Crimson Kimono - 2.png"]),
+          buildCandidatesList(["Crimson Kimono - 3.webp", "Crimson Kimono - 3.jpg", "Crimson Kimono - 3.png"])
+        ],
+        cust: []
+      },
+      5: {
+        main: buildCandidatesList([
+          "POW - Main.jpg",
+          "POW - Main.webp",
+          "POW - Main.png",
+          "POW - Main_2.jpg"
+        ]),
+        thumbs: [
+          buildCandidatesList(["POW - 2.webp", "POW - 2_2.webp"])
+        ],
+        cust: [
+          buildCandidatesList(["POW - Customer - 1.webp"]),
+          buildCandidatesList(["POW - Customer - 2.webp"]),
+          buildCandidatesList(["POW - Customer - 3.webp"])
+        ]
+      },
+      6: {
+        main: buildCandidatesList([
+          "Vice - Main.jpg",
+          "Vice - Main.webp",
+          "Vice - Main.png"
+        ]),
+        thumbs: [
+          buildCandidatesList(["Vice - 2.jpg", "Vice - 2.webp", "Vice - 2.png"]),
+          buildCandidatesList(["Vice - 3.jpg", "Vice - 3.webp", "Vice - 3.png"])
+        ],
+        cust: []
+      },
+      7: {
+        main: buildCandidatesList([
+          "Spearmint - Main.jpg",
+          "Spearmint - Main.webp",
+          "Spearmint - Main.png"
+        ]),
+        thumbs: [
+          buildCandidatesList(["Spearmint - 2.webp"]),
+          buildCandidatesList(["Spearmint - 3.webp"]),
+          buildCandidatesList(["Spearmint - 4.webp"])
+        ],
+        cust: [
+          buildCandidatesList(["Spearmint - Customer - 1.webp"]),
+          buildCandidatesList(["Spearmint - Customer - 2.webp"]),
+          buildCandidatesList(["Spearmint - Customer - 3.webp"]),
+          buildCandidatesList(["Spearmint - Customer - 4.webp"])
+        ]
+      },
+      8: {
+        main: buildCandidatesList([
+          "Nocts - Main_2.jpg",
+          "Nocts - Main.jpg",
+          "Nocts - Main.webp",
+          "Nocts - Main.png"
+        ]),
+        thumbs: [
+          buildCandidatesList(["Nocts - 2.webp", "Nocts - 2_2.webp"])
+        ],
+        cust: [
+          buildCandidatesList(["Nocts - Customer - 1.webp", "Nocts - Customer - 1_2.webp"]),
+          buildCandidatesList(["Nocts - Customer - 2.webp", "Nocts - Customer - 2_2.webp"])
+        ]
+      },
+      9: {
+        main: buildCandidatesList([
+          "Others - Ladies Snow - Main.jpg",
+          "Others - Ladies Snow - Main.webp",
+          "Others - Ladies Snow - Main.png",
+          "Ladies Snow - Main.jpg"
+        ]),
+        thumbs: [
+          buildCandidatesList(["Others - Ladies Snow - 2.jpg", "Ladies Snow - 2.jpg"]),
+          buildCandidatesList(["Others - Ladies Snow - 3.jpg", "Ladies Snow - 3.jpg"]),
+          buildCandidatesList(["Others - Ladies Snow - 4.jpg", "Ladies Snow - 4.jpg"])
+        ],
+        cust: []
+      },
+      10: {
+        main: buildCandidatesList([
+          "Others -  Heat Resistant Black - Main.jpg",
+          "Others - Heat Resistant Black - Main.jpg",
+          "Others -  Heat Resistant Black - Main.png",
+          "Others - Heat Resistant Black - Main.png",
+          "Heat Resistant Black - Main.jpg"
+        ]),
+        thumbs: [
+          buildCandidatesList(["Others -  Heat Resistant Black - 2.png", "Others - Heat Resistant Black - 2.png", "Others -  Heat Resistant Black - 2.jpg"]),
+          buildCandidatesList(["Others -  Heat Resistant Black - 3.jpg", "Others - Heat Resistant Black - 3.jpg", "Others -  Heat Resistant Black - 3.png"]),
+          buildCandidatesList(["Others -  Heat Resistant Black - 4.png", "Others - Heat Resistant Black - 4.png", "Others -  Heat Resistant Black - 4.jpg"]),
+          buildCandidatesList(["Others -  Heat Resistant Black - 5.png", "Others - Heat Resistant Black - 5.png", "Others -  Heat Resistant Black - 5.jpg"])
+        ],
+        cust: []
+      },
+      11: {
+        main: buildCandidatesList([
+          "Valo - Fuzzy Omen - Main.webp",
+          "Valo - Fuzzy Omen - Main.jpg",
+          "Valo - Fuzzy Omen - Main.png",
+          "Fuzzy Omen - Main.webp"
+        ]),
+        thumbs: [
+          buildCandidatesList(["Valo - Fuzzy Omen - 2.webp", "Valo - Fuzzy Omen - 2.jpg", "Fuzzy Omen - 2.webp"]),
+          buildCandidatesList(["Valo - Fuzzy Omen - 3.webp", "Valo - Fuzzy Omen - 3.jpg", "Fuzzy Omen - 3.webp"]),
+          buildCandidatesList(["Valo - Fuzzy Omen - 4.webp", "Valo - Fuzzy Omen - 4.jpg", "Fuzzy Omen - 4.webp"])
+        ],
+        cust: []
+      },
+      12: {
+        main: buildCandidatesList([
+          "Valo - Yoru - Main.webp",
+          "Valo - Yoru - Main.jpg",
+          "Valo - Yoru - Main.png",
+          "Yoru - Main.webp"
+        ]),
+        thumbs: [
+          buildCandidatesList(["Valo - Yoru - 2.webp", "Valo - Yoru - 2.jpg", "Yoru - 2.webp"]),
+          buildCandidatesList(["Valo - Yoru - 3.webp", "Valo - Yoru - 3.jpg", "Yoru - 3.webp"]),
+          buildCandidatesList(["Valo - Yoru - 4.webp", "Valo - Yoru - 4.jpg", "Yoru - 4.webp"])
+        ],
+        cust: []
+      }
+    };
+
+    // Bộ dữ liệu Feedback (tầm 30 - 50 đánh giá/sản phẩm) với văn phong người mua thực tế
+    const productFeedbacksMap = {
+      1: {
+        totalCount: 48,
+        reviews: [
+          {
+            user: "t***k (8)",
+            time: "6 tháng qua",
+            verified: true,
+            comment: "Tôi thực sự rất bất ngờ với đôi Pandora's Box này!! Chất lượng của chúng thực sự rất tốt. Kiểu như... chúng thực sự có thể sử dụng được ngoài đời chứ không chỉ là đồ cosplay. Điều duy nhất chưa hoàn hảo lắm là một vài đường kẻ nhựa ở mu bàn tay hơi lệch tâm một chút xíu, nhưng dù sao thì đeo lên vẫn cực kỳ thoải mái và khá ấm nữa. Rất tuyệt!"
+          },
+          {
+            user: "u***l (20)",
+            time: "6 tháng qua",
+            verified: true,
+            comment: "Đây là bản sao hoàn hảo 1:1 của đôi găng tay Pandora's Box trong game! Tôi chắc chắn sẽ mua thêm!"
+          },
+          {
+            user: "k***8 (21)",
+            time: "Năm vừa qua",
+            verified: true,
+            comment: "Chất lượng tuyệt vời, sản phẩm đến trong tình trạng rất tốt, gần như hoàn hảo, chỉ có một vài sợi chỉ nhỏ dư ra ở khớp ngón tay mình cắt đi là xong, ngoài ra trông rất hoàn hảo, gần như là bản sao 1:1."
+          },
+          {
+            user: "y***s (36)",
+            time: "Tháng trước",
+            verified: true,
+            comment: "Người bán đáng tin cậy, giao hàng rất nhanh so với hàng order, đóng gói tuyệt vời, đúng như mô tả, giao tiếp hỗ trợ nhiệt tình. Cảm ơn shop."
+          },
+          {
+            user: "Phản hồi tự động",
+            time: "Tháng trước",
+            verified: false,
+            comment: "Đơn hàng được giao đúng giờ và không có vấn đề gì."
+          }
+        ]
+      },
+      2: {
+        totalCount: 39,
+        reviews: [
+          {
+            user: "0***t (2)",
+            time: "6 tháng qua",
+            verified: true,
+            comment: "Tuyệt vời! Tôi nhận được hàng khá nhanh!! Túi bọc bên ngoài hơi nhăn một chút do vận chuyển đường xa nhưng tôi đã lường trước điều đó. Đôi găng tay Amphibious bên trong thì hoàn toàn hoàn hảo! Đúng như mô tả, thậm chí còn tốt hơn cả mong đợi. Hiện đang được trưng bày trên kệ cùng với con dao Karambit Doppler của tôi và trông rất hợp. Hoàn toàn hài lòng!"
+          },
+          {
+            user: "c***n (100)",
+            time: "6 tháng qua",
+            verified: true,
+            comment: "Người bán rất nhiệt tình, luôn trả lời câu hỏi nhanh chóng. Sản phẩm được đóng gói cẩn thận. Tôi khuyên bạn nên mua hàng từ cửa hàng này."
+          },
+          {
+            user: "r***m (223)",
+            time: "Năm vừa qua",
+            verified: true,
+            comment: "Sản phẩm chất lượng tuyệt vời, tình trạng đúng như mô tả và màu xanh lên nhìn rất đẹp!"
+          },
+          {
+            user: "Phản hồi tự động",
+            time: "Tháng trước",
+            verified: false,
+            comment: "Đơn hàng được giao đúng giờ và không có vấn đề gì."
+          }
+        ]
+      },
+      3: {
+        totalCount: 34,
+        reviews: [
+          {
+            user: "f***t (45)",
+            time: "Năm vừa qua",
+            verified: true,
+            comment: "Đôi Hedge Maze đã được giao và không chỉ trông giống hệt như trong ảnh mà chất lượng cũng rất tốt! Nó đến trong tình trạng hoàn hảo, tôi vô cùng hài lòng. Tuy nhiên phần băng dán ở cổ tay lúc mới mở hộp hơi cứng một chút, đeo vài hôm thì mềm ra vừa khít. Shop cũng đã chủ động liên hệ để thông báo lịch trình vận chuyển cho tôi, và mọi thứ đã đến sớm hơn dự kiến!"
+          },
+          {
+            user: "y***e (72)",
+            time: "Tháng trước",
+            verified: true,
+            comment: "Sản phẩm được giao nhanh chóng và trong tình trạng tuyệt vời. Bao bì đóng gói tốt và nhìn chung không có gì để chê, rất đáng để mua!"
+          },
+          {
+            user: "*****",
+            time: "6 tháng qua",
+            verified: true,
+            comment: "Giao hàng nhanh chóng. Đóng gói rất kỹ; hàng đến trong tình trạng hoàn hảo. Giá cả hợp lý. Rất đáng tin cậy."
+          },
+          {
+            user: "Phản hồi tự động",
+            time: "Tháng trước",
+            verified: false,
+            comment: "Đơn hàng được giao đúng giờ và không có vấn đề gì."
+          }
+        ]
+      },
+      4: {
+        totalCount: 42,
+        reviews: [
+          {
+            user: "m***h (19)",
+            time: "6 tháng qua",
+            verified: true,
+            comment: "Thực sự bất ngờ với độ hoàn thiện của đôi Crimson Kimono này! Phần giáp cao su chữ TORTUE ở mu bàn tay làm cực kỳ nét, màu đỏ tươi đúng chuẩn Max Red trong CS2. Có một vết chỉ thừa rất nhỏ ở mép cổ tay nhưng không ảnh hưởng gì cả. Đeo lên tay rất đầm và chắc chắn!"
+          },
+          {
+            user: "p***l (8)",
+            time: "6 tháng qua",
+            verified: true,
+            comment: "Sản phẩm được đóng gói cẩn thận và vận chuyển đúng như mô tả. Bản sao hoàn hảo 1:1 của đôi găng tay trong game!"
+          },
+          {
+            user: "v***a (54)",
+            time: "Tháng trước",
+            verified: true,
+            comment: "Người bán đáng tin cậy, đóng gói kỹ càng, đúng như mô tả. Lòng bàn tay dày dặn, đeo chạy xe máy hay trưng góc setup đều đẹp."
+          },
+          {
+            user: "Phản hồi tự động",
+            time: "Tháng trước",
+            verified: false,
+            comment: "Đơn hàng được giao đúng giờ và không có vấn đề gì."
+          }
+        ]
+      },
+      5: {
+        totalCount: 37,
+        reviews: [
+          {
+            user: "a***n (33)",
+            time: "6 tháng qua",
+            verified: true,
+            comment: "Với mức giá này thì đây thực sự là một đôi Moto Gloves rất xịn. Nó tái hiện hoàn hảo diện mạo POW! trong game mà tôi yêu thích. Phần gù nhựa cứng bảo vệ khớp tay rất chắc chắn, đeo vào cảm giác chất lượng tốt và cực kỳ thoải mái khi chạy xe. Chắc chắn khuyên dùng!"
+          },
+          {
+            user: "r***y (11)",
+            time: "Năm vừa qua",
+            verified: true,
+            comment: "Giao hàng nhanh, mẫu mã đẹp lắm, cảm ơn shop."
+          },
+          {
+            user: "t***b (6)",
+            time: "Tháng trước",
+            verified: true,
+            comment: "Sản phẩm chất lượng tuyệt vời, tình trạng đúng như mô tả và trông rất ngầu!"
+          },
+          {
+            user: "Phản hồi tự động",
+            time: "Tháng trước",
+            verified: false,
+            comment: "Đơn hàng được giao đúng giờ và không có vấn đề gì."
+          }
+        ]
+      },
+      6: {
+        totalCount: 45,
+        reviews: [
+          {
+            user: "k***z (27)",
+            time: "6 tháng qua",
+            verified: true,
+            comment: "Màu hồng và xanh dương của đôi Vice ngoài đời nhìn cực kỳ nổi bật! Lúc mới khui hộp có hơi mùi vải mới nhẹ nhưng để ra chỗ thoáng một buổi là hết sạch. Chất vải lưới 3D dày dặn, đeo lên tay vừa vặn và chụp ảnh dưới đèn LED trong phòng thì đẹp khỏi bàn!"
+          },
+          {
+            user: "h***n (16)",
+            time: "6 tháng qua",
+            verified: true,
+            comment: "Đây là bản sao hoàn hảo 1:1 của đôi găng tay trong game! Tôi sẽ mua thêm mẫu khác nữa!"
+          },
+          {
+            user: "d***m (9)",
+            time: "Tháng trước",
+            verified: true,
+            comment: "Người bán rất nhiệt tình, luôn trả lời câu hỏi nhanh chóng. Sản phẩm được đóng gói cẩn thận."
+          },
+          {
+            user: "Phản hồi tự động",
+            time: "Tháng trước",
+            verified: false,
+            comment: "Đơn hàng được giao đúng giờ và không có vấn đề gì."
+          }
+        ]
+      },
+      7: {
+        totalCount: 41,
+        reviews: [
+          {
+            user: "i***c (5)",
+            time: "6 tháng qua",
+            verified: true,
+            comment: "So với mức giá thì đôi Moto Gloves Spearmint này thực sự quá ngon. Chúng giống hệt giao diện trong game mà nhà sản xuất hướng tới. Gù bảo vệ cứng cáp, da mềm và đeo rất êm tay. Hoàn toàn xứng đáng!"
+          },
+          {
+            user: "0***a (109)",
+            time: "Năm vừa qua",
+            verified: true,
+            comment: "Vận chuyển nhanh, ngoại hình tuyệt vời, cảm ơn bạn."
+          },
+          {
+            user: "l***p (19)",
+            time: "Tháng trước",
+            verified: true,
+            comment: "Đóng gói rất kỹ; hàng đến trong tình trạng hoàn hảo. Màu trắng xanh bạc hà bên ngoài nhìn rất sạch và sang."
+          },
+          {
+            user: "Phản hồi tự động",
+            time: "Tháng trước",
+            verified: false,
+            comment: "Đơn hàng được giao đúng giờ và không có vấn đề gì."
+          }
+        ]
+      },
+      8: {
+        totalCount: 49,
+        reviews: [
+          {
+            user: "n***h (45)",
+            time: "6 tháng qua",
+            verified: true,
+            comment: "Tôi thực sự rất ấn tượng với đôi Nocts đen tuyền này!! Không chỉ dùng để trưng bày hay cosplay mà mình đeo chạy xe đi làm hàng ngày luôn vì màu đen nhám rất lịch sự và đỡ bám bẩn. Chỉ có một vệt keo cực nhỏ sát viền cổ tay nhìn kỹ mới thấy, còn lại mọi thứ đều hoàn hảo 10/10!"
+          },
+          {
+            user: "v***k (12)",
+            time: "6 tháng qua",
+            verified: true,
+            comment: "Sản phẩm chất lượng tuyệt vời, tình trạng đúng như mô tả và trông rất đẹp!"
+          },
+          {
+            user: "t***q (30)",
+            time: "Tháng trước",
+            verified: true,
+            comment: "Người bán đáng tin cậy, giao hàng nhanh, đóng gói tuyệt vời, đúng như mô tả. Cảm ơn mọi người."
+          },
+          {
+            user: "Phản hồi tự động",
+            time: "Tháng trước",
+            verified: false,
+            comment: "Đơn hàng được giao đúng giờ và không có vấn đề gì."
+          }
+        ]
+      },
+      9: {
+        totalCount: 33,
+        reviews: [
+          {
+            user: "l***a (16)",
+            time: "6 tháng qua",
+            verified: true,
+            comment: "Đôi găng tay mùa đông này đến trong tình trạng hoàn hảo và ấm hơn tôi nghĩ rất nhiều! Phần cổ tay dệt kim ôm sát chắn gió cực tốt, có cả cái móc nhựa nhỏ để kẹp hai chiếc vào nhau khỏi bị thất lạc. Với giá 290k thì thực sự không có điểm gì để chê!"
+          },
+          {
+            user: "t***m (9)",
+            time: "Tháng trước",
+            verified: true,
+            comment: "Giao hàng nhanh chóng. Đóng gói rất kỹ; hàng đến trong tình trạng hoàn hảo. Giá cả hợp lý."
+          },
+          {
+            user: "Phản hồi tự động",
+            time: "Tháng trước",
+            verified: false,
+            comment: "Đơn hàng được giao đúng giờ và không có vấn đề gì."
+          }
+        ]
+      },
+      10: {
+        totalCount: 31,
+        reviews: [
+          {
+            user: "c***i (19)",
+            time: "6 tháng qua",
+            verified: true,
+            comment: "Găng tay chịu nhiệt hoạt động đúng như mô tả! Mình dùng máy uốn tóc ở nhiệt độ cao chạm vào ống uốn mà không bị bỏng tay. Lúc mới đeo cảm giác hơi ôm sát một xíu nhưng nhờ vậy mà cầm lọn tóc không bị trơn trượt. Rất tiện lợi!"
+          },
+          {
+            user: "b***n (11)",
+            time: "Tháng trước",
+            verified: true,
+            comment: "Sản phẩm được đóng gói cẩn thận và vận chuyển đúng như mô tả. Rất đáng mua."
+          },
+          {
+            user: "Phản hồi tự động",
+            time: "Tháng trước",
+            verified: false,
+            comment: "Đơn hàng được giao đúng giờ và không có vấn đề gì."
+          }
+        ]
+      },
+      11: {
+        totalCount: 44,
+        reviews: [
+          {
+            user: "o***n (28)",
+            time: "6 tháng qua",
+            verified: true,
+            comment: "Tuyệt vời! Nhận được hàng cái là phải đội thử ngay!! Túi đóng gói bên ngoài hơi ép nhẹ làm phần tai mèo hơi bẹp lúc mới mở, nhưng chỉ cần lấy tay nắn nhẹ một lúc là phồng đẹp hoàn hảo như hình! Chất lông xù siêu mềm và ấm, phần đệm chân mèo ở hộc bao tay làm cực kỳ cưng. Không thể hài lòng hơn!"
+          },
+          {
+            user: "m***u (14)",
+            time: "6 tháng qua",
+            verified: true,
+            comment: "Sản phẩm chất lượng tuyệt vời, tình trạng đúng như mô tả và trông rất dễ thương! Ba vệt mắt của Omen thêu rất nét."
+          },
+          {
+            user: "k***i (35)",
+            time: "Tháng trước",
+            verified: true,
+            comment: "Người bán rất nhiệt tình, luôn trả lời câu hỏi nhanh chóng. Sản phẩm được đóng gói cẩn thận."
+          },
+          {
+            user: "Phản hồi tự động",
+            time: "Tháng trước",
+            verified: false,
+            comment: "Đơn hàng được giao đúng giờ và không có vấn đề gì."
+          }
+        ]
+      },
+      12: {
+        totalCount: 36,
+        reviews: [
+          {
+            user: "y***u (42)",
+            time: "6 tháng qua",
+            verified: true,
+            comment: "Bộ găng tay Yoru đã được giao và không chỉ trông giống hệt như trong ảnh mà chất vải thun cũng rất mịn và mát! Mấy hạt đinh tán nhỏ ở cổ tay gắn khá chắc, thiết kế hở ngón nên mình vừa đeo cosplay vừa ngồi bắn Valorant thoải mái không bị vướng chuột. Mọi thứ đến sớm hơn dự kiến!"
+          },
+          {
+            user: "r***n (17)",
+            time: "Năm vừa qua",
+            verified: true,
+            comment: "Đây là bản sao hoàn hảo của đôi găng tay Yoru trong game! Đóng gói kỹ, rất đáng tiền!"
+          },
+          {
+            user: "Phản hồi tự động",
+            time: "Tháng trước",
+            verified: false,
+            comment: "Đơn hàng được giao đúng giờ và không có vấn đề gì."
+          }
+        ]
+      }
+    };
+
+    const defaultProductsData = [
+      {
+        id: 1,
+        name: "Sport Gloves / Pandora's Box",
+        game: "CS2",
+        tag: "Bán chạy",
+        price: 1600000,
+        description: "Pandora's Box là một trong những đôi găng tay Sport Gloves mang tính biểu tượng nhất trong CS2. Với sự phối hợp màu tím và đen cực kỳ ma mị, hoa văn sắc nét, đây là sự lựa chọn hoàn hảo tôn lên vẻ sang trọng và độc đáo cho nhân vật của bạn.",
+        features: [
+          "Chất liệu da tổng hợp cao cấp",
+          "Lớp đệm đàn hồi thoải mái",
+          "Màu tím neon sắc nét chuẩn mẫu in-game"
+        ],
+        mainImage: "Pandora's Box - Main.jpg",
+        thumbnails: [
+          "Pandora's Box - 2.jpg",
+          "Pandora's Box - 3.jpg",
+          "Pandora's Box - 4.jpg"
+        ],
+        customerPhotos: [
+          "Pandora's Box - Customer - 1.webp",
+          "Pandora's Box - Customer - 2.webp",
+          "Pandora's Box - Customer - 3.webp",
+          "Pandora's Box - Customer - 4.webp",
+          "Pandora's Box - Customer - 5.webp",
+          "Pandora's Box - Customer - 6.webp",
+          "Pandora's Box - Customer - 7.jpg",
+          "Pandora's Box - Customer - 8.jpg",
+          "Pandora's Box - Customer - 9.jpg",
+          "Pandora's Box - Customer - 10.jpg",
+          "Pandora's Box - Customer - 11.jpg"
+        ]
+      },
+      {
+        id: 2,
+        name: "Sport Gloves / Amphibious",
+        game: "CS2",
+        tag: "Cao cấp",
+        price: 1600000,
+        description: "Tông màu xanh đại dương tươi mát, kết hợp cực đỉnh cùng dao Sapphire.",
+        features: ["Chất liệu thoáng khí", "Đường may gia cố 2 lớp"],
+        mainImage: "Amphibious - Main.jpg",
+        thumbnails: [
+          "Amphibious - 2.webp",
+          "Amphibious - 3.webp"
+        ],
+        customerPhotos: []
+      },
+      {
+        id: 3,
+        name: "Sport Gloves / Hedge Maze",
+        game: "CS2",
+        tag: "Mới",
+        price: 1600000,
+        description: "Sắc xanh lá Mê Cung tràn đầy sức sống.",
+        features: ["Phối màu Emerald đỉnh cao"],
+        mainImage: "Hedge Maze - Main.jpg",
+        thumbnails: [
+          "Hedge Maze - 2.webp",
+          "Hedge Maze - 3.webp"
+        ],
+        customerPhotos: [
+          "Hedge Maze - Customer - 1.jpg",
+          "Hedge Maze - Customer - 2.webp"
+        ]
+      },
+      {
+        id: 4,
+        name: "Specialist Gloves / Crimson Kimono",
+        game: "CS2",
+        tag: "Bán chạy",
+        price: 1780000,
+        description: "Phối màu Đỏ Crimson và Đen lấy cảm hứng từ họa tiết Kimono truyền thống cực kỳ nổi bật trong CS2. Trang bị lớp giáp cao su TORTUE đúc nổi 3D bảo vệ mu bàn tay cùng lòng bàn tay may gia cố nhiều lớp siêu bền bỉ.",
+        features: [
+          "Giáp cao su TORTUE đúc nổi 3D cực kỳ chi tiết trên mu bàn tay",
+          "Họa tiết hình thoi Crimson Kimono sắc nét chuẩn nguyên mẫu in-game",
+          "Lòng bàn tay gia cố đệm chống trượt và đường chỉ đôi siêu bền"
+        ],
+        mainImage: "Crimson Kimono - Main.jpg",
+        thumbnails: [
+          "Crimson Kimono - 2.webp",
+          "Crimson Kimono - 3.webp"
+        ],
+        customerPhotos: []
+      },
+      {
+        id: 5,
+        name: "Moto Gloves / POW",
+        game: "CS2",
+        tag: "Mới",
+        price: 1780000,
+        description: "Phong cách găng tay đua xe cá tính.",
+        features: ["Đệm gù bảo vệ khớp tay"],
+        mainImage: "POW - Main.jpg",
+        thumbnails: [
+          "POW - 2.webp"
+        ],
+        customerPhotos: [
+          "POW - Customer - 1.webp",
+          "POW - Customer - 2.webp",
+          "POW - Customer - 3.webp"
+        ]
+      },
+      {
+        id: 6,
+        name: "Sport Gloves / Vice",
+        game: "CS2",
+        tag: "Cao cấp",
+        price: 1600000,
+        description: "Sự kết hợp giữa sắc hồng Neon và xanh Cyan đậm chất Miami.",
+        features: ["Màu sắc nổi bật rực rỡ", "Vải lưới dập nổi 3D thoáng khí chuẩn form Sport Gloves"],
+        mainImage: "Vice - Main.jpg",
+        thumbnails: [
+          "Vice - 2.jpg",
+          "Vice - 3.jpg"
+        ],
+        customerPhotos: []
+      },
+      {
+        id: 7,
+        name: "Moto Gloves / Spearmint",
+        game: "CS2",
+        tag: null,
+        price: 1780000,
+        description: "Phối màu Trắng - Xanh Bạc Hà thanh lịch.",
+        features: ["Kiểu dáng Moto tác chiến"],
+        mainImage: "Spearmint - Main.jpg",
+        thumbnails: [
+          "Spearmint - 2.webp",
+          "Spearmint - 3.webp",
+          "Spearmint - 4.webp"
+        ],
+        customerPhotos: [
+          "Spearmint - Customer - 1.webp",
+          "Spearmint - Customer - 2.webp",
+          "Spearmint - Customer - 3.webp",
+          "Spearmint - Customer - 4.webp"
+        ]
+      },
+      {
+        id: 8,
+        name: "Sport Gloves / Nocts",
+        game: "CS2",
+        tag: null,
+        price: 1780000,
+        description: "Găng tay đen tuyền Stealth bí ẩn.",
+        features: ["Màu đen nhám sang trọng"],
+        mainImage: "Nocts - Main_2.jpg",
+        thumbnails: [
+          "Nocts - 2.webp"
+        ],
+        customerPhotos: [
+          "Nocts - Customer - 1.webp",
+          "Nocts - Customer - 2.webp"
+        ]
+      },
+      {
+        id: 9,
+        name: "Găng tay thể thao mùa đông dành cho nữ",
+        game: "Khác",
+        tag: "Mới",
+        price: 290000,
+        description: "Mẫu găng tay thể thao mùa đông dành cho nữ (Voloker Skiing) với thiết kế hiện đại, thanh lịch. Trang bị cổ tay dệt kim chắn gió (Knit Windproof Cuff), đai dán Velcro chắc chắn, lòng bàn tay chống trượt và khóa cài chống thất lạc tiện lợi.",
+        features: [
+          "Cổ tay bo chun co giãn & dệt kim chắn gió giữ nhiệt tối ưu",
+          "Đai dán Velcro điều chỉnh linh hoạt vừa vặn cổ tay",
+          "Khóa bấm nối đôi găng (Anti-loss Connector Clip) tiện lợi khi bảo quản"
+        ],
+        mainImage: "Others - Ladies Snow - Main.jpg",
+        thumbnails: [
+          "Others - Ladies Snow - 2.jpg",
+          "Others - Ladies Snow - 3.jpg",
+          "Others - Ladies Snow - 4.jpg"
+        ],
+        customerPhotos: []
+      },
+      {
+        id: 10,
+        name: "Găng tay đen cao cấp chịu nhiệt dùng cho tạo kiểu tóc",
+        game: "Khác",
+        tag: "Mới",
+        price: 550000,
+        description: "Găng tay đen cao cấp chuyên dụng cách nhiệt và chống bỏng khi sử dụng các thiết bị tạo kiểu tóc bằng nhiệt (máy uốn tóc, máy duỗi, máy sấy công suất cao). Chất liệu sợi chịu nhiệt co giãn 4 chiều ôm sát bàn tay, giúp thao tác giữ lọn tóc linh hoạt và an toàn tuyệt đối.",
+        features: [
+          "Chất liệu sợi cách nhiệt cao cấp bảo vệ bàn tay khỏi trục uốn/duỗi nóng",
+          "Vải co giãn 4 chiều mềm mại, ôm sát ngón tay giúp thao tác tạo kiểu chính xác",
+          "Đai dán cổ tay Velcro chắc chắn, dễ dàng điều chỉnh vừa vặn cho cả hai bên tay"
+        ],
+        mainImage: "Others -  Heat Resistant Black - Main.jpg",
+        thumbnails: [
+          "Others -  Heat Resistant Black - 2.png",
+          "Others -  Heat Resistant Black - 3.jpg",
+          "Others -  Heat Resistant Black - 4.png",
+          "Others -  Heat Resistant Black - 5.png"
+        ],
+        customerPhotos: []
+      },
+      {
+        id: 11,
+        name: "Khăn choàng lông xù mũ, bao tay Omen",
+        game: "Valorant",
+        tag: "Mới",
+        price: 1650000,
+        description: "Khăn choàng lông xù liền mũ trùm đầu kèm bao tay giữ ấm lấy cảm hứng từ Đặc vụ Omen trong Valorant phiên bản tai mèo dễ thương. Chất liệu lông nhung dày dặn, siêu mềm mịn với điểm nhấn 3 vệt mắt xanh đặc trưng và đệm chân mèo xanh ngọc ở hai đầu bao tay.",
+        features: [
+          "Thiết kế 3 trong 1: Mũ trùm đầu tai mèo + Khăn choàng cổ + Bao tay giữ ấm",
+          "Chất liệu lông xù cao cấp mềm mịn, giữ nhiệt cực tốt và thân thiện với làn da",
+          "Thêu nổi sắc nét 3 vệt mắt Omen và đệm thịt chân mèo màu xanh ngọc"
+        ],
+        mainImage: "Valo - Fuzzy Omen - Main.webp",
+        thumbnails: [
+          "Valo - Fuzzy Omen - 2.webp",
+          "Valo - Fuzzy Omen - 3.webp",
+          "Valo - Fuzzy Omen - 4.webp"
+        ],
+        customerPhotos: []
+      },
+      {
+        id: 12,
+        name: "Yoru",
+        game: "Valorant",
+        tag: "Mới",
+        price: 770000,
+        description: "Găng tay chiến thuật hở ngón lấy cảm hứng từ Đặc vụ Yoru (Rift Walker) trong Valorant. Thiết kế ôm sát bàn tay và cổ tay với tông màu xanh dương - tím đậm đặc trưng, kết hợp họa tiết sắc sảo và đinh tán kim loại ở viền cổ tay, cực kỳ phù hợp cho cả Cosplay lẫn đeo khi chơi game.",
+        features: [
+          "Thiết kế hở ngón (Fingerless) giúp thao tác bàn phím và chuột linh hoạt tuyệt đối",
+          "Chất vải Spandex pha Polyester co giãn 4 chiều, thoáng khí và ôm sát form tay",
+          "Họa tiết in chuyển nhiệt 3D sắc nét kèm chi tiết đinh tán đặc trưng của Yoru"
+        ],
+        mainImage: "Valo - Yoru - Main.webp",
+        thumbnails: [
+          "Valo - Yoru - 2.webp",
+          "Valo - Yoru - 3.webp",
+          "Valo - Yoru - 4.webp"
+        ],
+        customerPhotos: []
+      }
+    ];
+
+    let products = JSON.parse(JSON.stringify(defaultProductsData));
+
+    let cart = [];
+    let appliedDiscount = 0;
+    let appliedPromoCode = "";
+    let selectedPaymentMethod = "BANK";
+    let isDark = true; // Mặc định chế độ Tối (Dark Mode)
+    let currentOpenProductId = 1;
+
+    let currentGalleryList = [];
+    let activeGalleryIdx = 0;
+    let thumbWindowStart = 0;
+
+    let currentLightboxPhotos = [];
+    let currentLightboxIdx = 0;
+
+    function formatMoney(amount) {
+      return amount.toLocaleString('vi-VN') + 'đ';
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast-box');
+      toast.innerText = message;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 2800);
+    }
+
+    function handleSmartImgError(imgEl, prodId, slotType, idx) {
+      const step = parseInt(imgEl.dataset.retryStep || '0', 10);
+      const altConfig = productAltNames[prodId];
+
+      let candidates = [];
+      if (altConfig) {
+        if (slotType === 'main' && Array.isArray(altConfig.main)) {
+          candidates = altConfig.main;
+        } else if (slotType === 'thumb' && altConfig.thumbs && Array.isArray(altConfig.thumbs[idx])) {
+          candidates = altConfig.thumbs[idx];
+        } else if (slotType === 'cust' && altConfig.cust && Array.isArray(altConfig.cust[idx])) {
+          candidates = altConfig.cust[idx];
+        }
+      }
+
+      if (step < candidates.length) {
+        imgEl.dataset.retryStep = String(step + 1);
+        imgEl.src = candidates[step];
+      }
+    }
+
+    function updateNavActiveState(activeTab) {
+      const homeBtn = document.getElementById('nav-home-btn');
+      const shopBtn = document.getElementById('nav-shop-btn');
+      const faqBtn = document.getElementById('nav-faq-btn');
+      const inactiveClass = "text-secondary hover:text-primary transition-colors cursor-pointer";
+      const activeClass = "text-blue-600 transition-colors cursor-pointer";
+
+      if (homeBtn) homeBtn.className = activeTab === 'home' ? activeClass : inactiveClass;
+      if (shopBtn) shopBtn.className = activeTab === 'shop' ? activeClass : inactiveClass;
+      if (faqBtn) faqBtn.className = activeTab === 'faq' ? activeClass : inactiveClass;
+    }
+
+    function showHome3DView() {
+      document.getElementById('hero-3d-view').classList.remove('hidden');
+      document.getElementById('main-shop-container').classList.add('hidden');
+      document.getElementById('header-search-container').classList.add('hidden');
+      updateNavActiveState('home');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showProductList() {
+      document.getElementById('hero-3d-view').classList.add('hidden');
+      document.getElementById('main-shop-container').classList.remove('hidden');
+      document.getElementById('header-search-container').classList.remove('hidden');
+
+      document.getElementById('product-detail-view').classList.add('hidden');
+      document.getElementById('cart-view').classList.add('hidden');
+      document.getElementById('faq-contact-view').classList.add('hidden');
+      document.getElementById('product-list-view').classList.remove('hidden');
+      document.getElementById('promo-banner').classList.remove('hidden');
+
+      updateNavActiveState('shop');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showFaqContactView() {
+      document.getElementById('hero-3d-view').classList.add('hidden');
+      document.getElementById('main-shop-container').classList.remove('hidden');
+      document.getElementById('header-search-container').classList.add('hidden');
+
+      document.getElementById('product-list-view').classList.add('hidden');
+      document.getElementById('product-detail-view').classList.add('hidden');
+      document.getElementById('cart-view').classList.add('hidden');
+      document.getElementById('promo-banner').classList.add('hidden');
+      document.getElementById('faq-contact-view').classList.remove('hidden');
+
+      updateNavActiveState('faq');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Gửi tin nhắn từ trang Liên hệ sang kênh Discord Liên hệ riêng biệt
+    function submitContactForm(event) {
+      event.preventDefault();
+      const name = document.getElementById('contact-name').value.trim();
+      const email = document.getElementById('contact-email').value.trim();
+      const orderId = document.getElementById('contact-order').value.trim() || 'Không đính kèm';
+      const message = document.getElementById('contact-message').value.trim();
+
+      if (DISCORD_CONTACT_WEBHOOK_URL && DISCORD_CONTACT_WEBHOOK_URL.startsWith('http')) {
+        const contactPayload = {
+          username: "GLOVES VAULT Support Bot",
+          content: "📩 **CÓ TIN NHẮN LIÊN HỆ MỚI TỪ KHÁCH HÀNG!**",
+          embeds: [{
+            title: "Yêu cầu hỗ trợ / Liên hệ",
+            color: 3447003,
+            fields: [
+              { name: "👤 Họ và tên", value: name, inline: true },
+              { name: "📧 Email", value: email, inline: true },
+              { name: "🔖 Mã đơn hàng", value: orderId, inline: true },
+              { name: "💬 Nội dung tin nhắn", value: message, inline: false }
+            ],
+            footer: { text: "GLOVES VAULT Contact System" },
+            timestamp: new Date().toISOString()
+          }]
+        };
+
+        fetch(DISCORD_CONTACT_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(contactPayload)
+        }).catch(err => console.error("Lỗi gửi Discord Liên hệ:", err));
+      }
+
+      showToast('✅ Cảm ơn ' + name + '! Tin nhắn của bạn đã được gửi. Chúng tôi sẽ phản hồi trong vòng 24 giờ.');
+      event.target.reset();
+    }
+
+    function showCartView() {
+      document.getElementById('hero-3d-view').classList.add('hidden');
+      document.getElementById('main-shop-container').classList.remove('hidden');
+      document.getElementById('header-search-container').classList.remove('hidden');
+
+      document.getElementById('product-list-view').classList.add('hidden');
+      document.getElementById('product-detail-view').classList.add('hidden');
+      document.getElementById('faq-contact-view').classList.add('hidden');
+      document.getElementById('promo-banner').classList.add('hidden');
+      document.getElementById('cart-view').classList.remove('hidden');
+
+      updateNavActiveState('none');
+      renderCart();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderProducts(items) {
+      const grid = document.getElementById('product-grid');
+      document.getElementById('product-count').innerText = items.length;
+
+      grid.innerHTML = items.map(product => `
+        <div 
+          onclick="openProductDetail(${product.id})"
+          class="bg-card border rounded-xl overflow-hidden flex flex-col justify-between transition-all group cursor-pointer hover:border-blue-500 hover:shadow-lg"
+        >
+          <div class="relative bg-img-container h-52 flex items-center justify-center p-4">
+            ${product.tag ? `<span class="absolute top-3 left-3 bg-gray-800 text-gray-100 text-xs font-bold px-2.5 py-1 rounded-full border border-gray-600 z-10">${product.tag}</span>` : ''}
+            ${product.mainImage ? `
+              <img 
+                id="grid-main-img-${product.id}"
+                src="${product.mainImage}"
+                alt="${product.name}" 
+                onload="makeCutoutTransparent(this)"
+                onerror="handleSmartImgError(this, ${product.id}, 'main', 0)"
+                class="main-cutout-img max-h-44 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
+              />
+            ` : `
+              <div class="text-xs text-secondary italic">Chưa có hình ảnh</div>
+            `}
+          </div>
+          <div class="p-4 flex flex-col justify-between flex-1">
+            <div>
+              <h4 class="font-bold text-primary text-base group-hover:text-blue-500 transition-colors">${product.name}</h4>
+              <p class="text-xs text-secondary mt-0.5">${product.game}</p>
+            </div>
+            <div class="flex items-center justify-between mt-5 pt-2">
+              <span class="font-extrabold text-primary text-base">${formatMoney(product.price)}</span>
+              <button onclick="event.stopPropagation(); addToCart(${product.id})" class="bg-gray-900 text-white font-medium text-xs px-4 py-2 rounded-lg hover:bg-black cursor-pointer">Thêm</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openProductDetail(productId) {
+      const product = products.find(p => p.id === productId);
+      if (!product) return;
+      currentOpenProductId = productId;
+
+      const uniqueThumbs = Array.from(new Set(product.thumbnails)).filter(url => url && url !== product.mainImage);
+
+      currentGalleryList = [
+        ...(product.mainImage ? [{ url: product.mainImage, slotType: 'main', subIdx: 0 }] : []),
+        ...uniqueThumbs.map((url, idx) => ({ url, slotType: 'thumb', subIdx: idx }))
+      ];
+      activeGalleryIdx = 0;
+      thumbWindowStart = 0;
+
+      const customerPhotosList = Array.from(new Set(product.customerPhotos || [])).filter(Boolean);
+      currentLightboxPhotos = [...customerPhotosList];
+
+      // Lấy dữ liệu đánh giá tiếng Việt riêng của sản phẩm này (giữ dòng phản hồi tự động ở cuối)
+      const feedbackData = productFeedbacksMap[product.id] || productFeedbacksMap[1];
+      const normalReviews = feedbackData.reviews.filter(r => r.verified).sort(() => Math.random() - 0.5);
+      const autoReviews = feedbackData.reviews.filter(r => !r.verified);
+      const displayReviews = [...normalReviews, ...autoReviews];
+
+      document.getElementById('hero-3d-view').classList.add('hidden');
+      document.getElementById('main-shop-container').classList.remove('hidden');
+      document.getElementById('header-search-container').classList.remove('hidden');
+
+      document.getElementById('product-list-view').classList.add('hidden');
+      document.getElementById('cart-view').classList.add('hidden');
+      document.getElementById('faq-contact-view').classList.add('hidden');
+      document.getElementById('promo-banner').classList.add('hidden');
+      
+      const detailView = document.getElementById('product-detail-view');
+      detailView.classList.remove('hidden');
+
+      detailView.innerHTML = `
+        <div class="space-y-10">
+          
+          <button onclick="showProductList()" class="inline-flex items-center gap-2 text-sm text-secondary hover:text-primary transition-colors bg-card border px-4 py-2 rounded-lg cursor-pointer">
+            ← Quay lại danh sách găng tay
+          </button>
+
+          <!-- MAIN PRODUCT CONTAINER -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+            
+            <!-- LEFT: MAIN IMAGE & SLIDING THUMBNAIL CAROUSEL BELOW -->
+            <div class="space-y-4">
+              <div class="bg-card border rounded-2xl p-6 flex items-center justify-center relative h-80 sm:h-96 overflow-hidden">
+                ${product.tag ? `<span class="absolute top-4 left-4 bg-gray-800 text-gray-100 text-xs font-bold px-3 py-1 rounded-full border border-gray-600 z-10">${product.tag}</span>` : ''}
+                ${product.mainImage ? `
+                  <img 
+                    id="main-pdp-img" 
+                    src="${product.mainImage}"
+                    onload="if(activeGalleryIdx === 0) makeCutoutTransparent(this);"
+                    onerror="handleSmartImgError(this, ${product.id}, 'main', 0)"
+                    class="main-cutout-img max-h-full max-w-full object-contain transition-all duration-200" 
+                  />
+                ` : `
+                  <div class="text-sm text-secondary italic">Chưa có hình ảnh cho sản phẩm này</div>
+                `}
+              </div>
+
+              <!-- DẢI ẢNH THU NHỎ BÊN DƯỚI (KHUNG ÔM SÁT KÍCH THƯỚC ẢNH) -->
+              <div class="space-y-2">
+                <div class="relative flex items-center">
+                  <button 
+                    type="button"
+                    id="thumb-prev-btn"
+                    onclick="slideThumbWindow(-1)"
+                    title="Xem ảnh trước"
+                    class="hidden absolute -left-3 z-20 w-8 h-8 rounded-full bg-gray-900/90 hover:bg-black text-white shadow-lg items-center justify-center font-bold text-lg cursor-pointer transition-transform hover:scale-105"
+                  >
+                    ‹
+                  </button>
+
+                  <div id="pdp-thumbs-grid" class="flex flex-wrap items-center gap-2.5"></div>
+
+                  <button 
+                    type="button"
+                    id="thumb-next-btn"
+                    onclick="slideThumbWindow(1)"
+                    title="Xem ảnh cuối"
+                    class="hidden absolute -right-3 z-20 w-8 h-8 rounded-full bg-gray-900/90 hover:bg-black text-white shadow-lg items-center justify-center font-bold text-lg cursor-pointer transition-transform hover:scale-105"
+                  >
+                    ›
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- RIGHT: DETAILS -->
+            <div class="space-y-6">
+              <div>
+                <span class="text-blue-500 text-xs font-bold uppercase tracking-wider">${product.game}</span>
+                <h1 class="text-3xl font-black text-primary mt-1">${product.name}</h1>
+                <div class="text-3xl font-black text-primary mt-3">${formatMoney(product.price)}</div>
+              </div>
+
+              <!-- GIỚI THIỆU SẢN PHẨM -->
+              <div>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-secondary mb-2">GIỚI THIỆU SẢN PHẨM</h3>
+                <p class="text-sm text-secondary leading-relaxed">${product.description}</p>
+              </div>
+
+              <!-- ĐẶC ĐIỂM NỔI BẬT -->
+              <div>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-secondary mb-2">ĐẶC ĐIỂM NỔI BẬT</h3>
+                <ul class="space-y-2 text-sm text-secondary list-disc pl-5">
+                  ${product.features.map(f => `<li>${f}</li>`).join('')}
+                </ul>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                <button onclick="addPdpToCart(${product.id}, false)" class="w-full bg-card border-2 border-gray-900 dark:border-gray-200 text-primary font-bold py-4 rounded-xl text-sm hover:opacity-80 transition-all cursor-pointer">
+                  + Thêm Vào Giỏ Hàng
+                </button>
+                <button onclick="addPdpToCart(${product.id}, true)" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl text-sm transition-all shadow-md cursor-pointer">
+                  Mua Ngay
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- FEEDBACK SECTION -->
+          <div class="border-t border-gray-300/40 pt-10 mt-12 space-y-6">
+            <div class="flex items-center justify-between">
+              <h2 class="text-xl font-bold text-primary">Feedback <span class="text-secondary font-normal">(${feedbackData.totalCount})</span></h2>
+            </div>
+
+            <!-- PHOTOS AND VIDEOS FROM CUSTOMERS -->
+            <div class="space-y-3">
+              <span class="text-xs font-bold text-secondary uppercase tracking-wider">Hình ảnh thực tế từ khách hàng (${customerPhotosList.length})</span>
+              <div class="flex flex-wrap items-center gap-3">
+                ${customerPhotosList.map((url, idx) => `
+                  <button
+                    type="button"
+                    onclick="openCustomerLightbox(${idx})"
+                    title="Bấm để mở cửa sổ xem ảnh"
+                    class="w-fit h-20 sm:h-24 rounded-xl border border-gray-600 hover:border-blue-500 overflow-hidden transition-all cursor-pointer shadow-sm bg-card p-0.5 group relative inline-flex items-center justify-center"
+                  >
+                    <img 
+                      id="cust-photo-${idx}"
+                      src="${url}"
+                      alt="Customer photo ${idx + 1}"
+                      onerror="handleSmartImgError(this, ${product.id}, 'cust', ${idx})"
+                      class="h-full w-auto object-contain rounded-lg group-hover:scale-105 transition-transform block" 
+                    />
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 pt-2">
+              <button class="px-4 py-1.5 rounded-full text-xs font-bold bg-card border border-gray-400 text-primary">Tất cả đánh giá ∨</button>
+              <button class="px-4 py-1.5 rounded-full text-xs font-medium bg-gray-200 text-gray-800">Ngoại hình</button>
+              <button class="px-4 py-1.5 rounded-full text-xs font-medium bg-gray-200 text-gray-800">Đáng tiền</button>
+              <button class="px-4 py-1.5 rounded-full text-xs font-medium bg-gray-200 text-gray-800">Chất lượng</button>
+              <button class="px-4 py-1.5 rounded-full text-xs font-medium bg-gray-200 text-gray-800">Trải nghiệm</button>
+              <button class="px-4 py-1.5 rounded-full text-xs font-medium bg-gray-200 text-gray-800">Độ vừa vặn</button>
+            </div>
+
+            <div class="space-y-6 pt-4 border-t border-gray-300/40">
+              ${displayReviews.map(rev => `
+                <div class="space-y-2 text-xs sm:text-sm border-b border-gray-700/20 pb-5 last:border-b-0">
+                  <div class="flex items-center gap-2">
+                    <span class="w-4 h-4 rounded-full bg-emerald-600 text-white inline-flex items-center justify-center text-[11px] font-bold leading-none">+</span>
+                    <span class="text-secondary text-xs">
+                      ${rev.user} · ${rev.time}
+                      ${rev.verified ? `<span class="ml-1 text-secondary">Mua hàng đã được xác minh</span>` : ''}
+                    </span>
+                  </div>
+                  <p class="text-primary leading-relaxed max-w-4xl">
+                    ${rev.comment}
+                  </p>
+                </div>
+              `).join('')}
+            </div>
+
+          </div>
+
+        </div>
+      `;
+
+      renderThumbnailCarousel();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderThumbnailCarousel() {
+      const grid = document.getElementById('pdp-thumbs-grid');
+      const prevBtn = document.getElementById('thumb-prev-btn');
+      const nextBtn = document.getElementById('thumb-next-btn');
+      if (!grid) return;
+
+      const visibleItems = currentGalleryList.slice(thumbWindowStart, thumbWindowStart + 4);
+
+      grid.innerHTML = visibleItems.map((item, localIdx) => {
+        const actualIdx = thumbWindowStart + localIdx;
+        const isSelected = actualIdx === activeGalleryIdx;
+        return `
+          <button 
+            type="button"
+            onclick="selectGalleryImage(${actualIdx})"
+            class="thumb-btn border-2 ${isSelected ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-gray-700'} bg-card rounded-xl p-0.5 h-20 sm:h-24 w-fit inline-flex items-center justify-center overflow-hidden transition-all hover:border-blue-400 cursor-pointer relative"
+          >
+            <img 
+              id="pdp-gallery-thumb-${actualIdx}"
+              src="${item.url}"
+              alt="Ảnh ${actualIdx + 1}" 
+              onload="${actualIdx === 0 ? 'makeCutoutTransparent(this)' : ''}"
+              onerror="handleSmartImgError(this, ${currentOpenProductId}, '${item.slotType}', ${item.subIdx})"
+              class="h-full w-auto object-contain rounded-lg block" 
+            />
+          </button>
+        `;
+      }).join('');
+
+      if (prevBtn) {
+        if (thumbWindowStart > 0) {
+          prevBtn.classList.remove('hidden');
+          prevBtn.classList.add('flex');
+        } else {
+          prevBtn.classList.add('hidden');
+          prevBtn.classList.remove('flex');
+        }
+      }
+
+      if (nextBtn) {
+        if (thumbWindowStart + 4 < currentGalleryList.length) {
+          nextBtn.classList.remove('hidden');
+          nextBtn.classList.add('flex');
+        } else {
+          nextBtn.classList.add('hidden');
+          nextBtn.classList.remove('flex');
+        }
+      }
+    }
+
+    function selectGalleryImage(actualIdx) {
+      activeGalleryIdx = actualIdx;
+      const item = currentGalleryList[actualIdx];
+      const mainImg = document.getElementById('main-pdp-img');
+      const thumbImg = document.getElementById('pdp-gallery-thumb-' + actualIdx);
+
+      if (mainImg && item) {
+        mainImg.dataset.retryStep = '0';
+        mainImg.dataset.cutoutDone = 'false';
+        mainImg.src = (thumbImg && thumbImg.getAttribute('src')) ? thumbImg.src : item.url;
+        mainImg.onerror = function() {
+          handleSmartImgError(this, currentOpenProductId, item.slotType, item.subIdx);
+        };
+      }
+      renderThumbnailCarousel();
+    }
+
+    function slideThumbWindow(delta) {
+      const maxStart = Math.max(0, currentGalleryList.length - 4);
+      thumbWindowStart = Math.min(maxStart, Math.max(0, thumbWindowStart + delta));
+      if (delta > 0 && thumbWindowStart + 3 < currentGalleryList.length) {
+        selectGalleryImage(thumbWindowStart + 3);
+      } else {
+        renderThumbnailCarousel();
+      }
+    }
+
+    /* CỬA SỔ LIGHTBOX RIÊNG CHO HÌNH ẢNH KHÁCH HÀNG */
+    function openCustomerLightbox(index) {
+      currentLightboxIdx = index;
+      const modal = document.getElementById('customer-lightbox-modal');
+      if (!modal) return;
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      updateCustomerLightboxView();
+    }
+
+    function updateCustomerLightboxView() {
+      const mainImg = document.getElementById('lightbox-main-img');
+      const counter = document.getElementById('lightbox-counter');
+      const thumbsRow = document.getElementById('lightbox-thumbs-row');
+
+      const pageCustImg = document.getElementById('cust-photo-' + currentLightboxIdx);
+      const targetSrc = (pageCustImg && pageCustImg.getAttribute('src')) ? pageCustImg.src : (currentLightboxPhotos[currentLightboxIdx] || "");
+
+      if (mainImg) {
+        mainImg.dataset.retryStep = '0';
+        mainImg.src = targetSrc;
+      }
+      if (counter) {
+        counter.innerText = (currentLightboxIdx + 1) + ' / ' + currentLightboxPhotos.length;
+      }
+      if (thumbsRow) {
+        thumbsRow.innerHTML = currentLightboxPhotos.map((url, idx) => {
+          const domImg = document.getElementById('cust-photo-' + idx);
+          const resolvedSrc = (domImg && domImg.getAttribute('src')) ? domImg.src : url;
+          return `
+            <button
+              type="button"
+              onclick="openCustomerLightbox(${idx})"
+              class="h-14 w-fit rounded-xl border-2 ${idx === currentLightboxIdx ? 'border-blue-500 scale-105' : 'border-gray-600 opacity-60 hover:opacity-100'} overflow-hidden transition-all cursor-pointer bg-card p-0.5 inline-flex items-center justify-center"
+            >
+              <img id="lb-thumb-${idx}" src="${resolvedSrc}" class="h-full w-auto object-contain rounded-lg block" onerror="handleSmartImgError(this, ${currentOpenProductId}, 'cust', ${idx})" />
+            </button>
+          `;
+        }).join('');
+      }
+    }
+
+    function stepCustomerLightbox(delta) {
+      if (!currentLightboxPhotos.length) return;
+      currentLightboxIdx = (currentLightboxIdx + delta + currentLightboxPhotos.length) % currentLightboxPhotos.length;
+      updateCustomerLightboxView();
+    }
+
+    function closeCustomerLightbox(event) {
+      const modal = document.getElementById('customer-lightbox-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function addPdpToCart(productId, goToCartImmediately) {
+      addToCart(productId);
+      if (goToCartImmediately) {
+        showCartView();
+      }
+    }
+
+    function handleFilter() {
+      const searchValue = document.getElementById('search-input').value.toLowerCase().trim();
+      const selectedGames = Array.from(document.querySelectorAll('.game-checkbox:checked')).map(cb => cb.value);
+      const selectedTags = Array.from(document.querySelectorAll('.tag-checkbox:checked')).map(cb => cb.value);
+      const maxPrice = parseInt(document.getElementById('price-range').value);
+      document.getElementById('price-display').innerText = formatMoney(maxPrice);
+
+      const sortBy = document.getElementById('sort-select').value;
+
+      let filtered = products.filter(item => {
+        const matchesSearch = item.name.toLowerCase().includes(searchValue) || item.game.toLowerCase().includes(searchValue);
+        const matchesGame = selectedGames.length === 0 || selectedGames.includes(item.game);
+        const matchesTag = selectedTags.length === 0 || (item.tag && selectedTags.includes(item.tag));
+        const matchesPrice = item.price <= maxPrice;
+        return matchesSearch && matchesGame && matchesTag && matchesPrice;
+      });
+
+      if (sortBy === 'low-high') filtered.sort((a, b) => a.price - b.price);
+      else if (sortBy === 'high-low') filtered.sort((a, b) => b.price - a.price);
+
+      renderProducts(filtered);
+    }
+
+    function resetFilters() {
+      document.getElementById('search-input').value = '';
+      document.querySelectorAll('.game-checkbox').forEach(cb => cb.checked = true);
+      document.querySelectorAll('.tag-checkbox').forEach(cb => cb.checked = false);
+      document.getElementById('price-range').value = 2000000;
+      document.getElementById('sort-select').value = 'popular';
+      handleFilter();
+    }
+
+    /* LOGIC QUẢN LÝ GIỎ HÀNG */
+    function getTotalCartQuantity() {
+      return cart.reduce((sum, item) => sum + item.quantity, 0);
+    }
+
+    function updateCartBadge() {
+      const totalQty = getTotalCartQuantity();
+      document.getElementById('cart-count').innerText = totalQty;
+      const headerBadge = document.getElementById('cart-header-badge');
+      if (headerBadge) {
+        headerBadge.innerText = totalQty + ' sản phẩm';
+      }
+    }
+
+    function addToCart(productIdOrName) {
+      let product = null;
+      if (typeof productIdOrName === 'number') {
+        product = products.find(p => p.id === productIdOrName);
+      } else {
+        product = products.find(p => p.name === productIdOrName) || products[0];
+      }
+      if (!product) return;
+
+      const domGridImg = document.getElementById('grid-main-img-' + product.id);
+      const resolvedMainImg = (domGridImg && domGridImg.getAttribute('src')) ? domGridImg.src : product.mainImage;
+
+      const existingItem = cart.find(item => item.productId === product.id);
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        cart.push({
+          cartItemId: Date.now() + Math.random(),
+          productId: product.id,
+          name: product.name,
+          game: product.game,
+          tag: product.tag,
+          price: product.price,
+          image: resolvedMainImg,
+          quantity: 1
+        });
+      }
+
+      updateCartBadge();
+      showToast('🛒 Đã thêm "' + product.name + '" vào giỏ hàng!');
+    }
+
+    function updateCartItemQty(index, delta) {
+      if (!cart[index]) return;
+      cart[index].quantity += delta;
+      if (cart[index].quantity <= 0) {
+        cart.splice(index, 1);
+        showToast('Đã xóa sản phẩm khỏi giỏ hàng');
+      }
+      updateCartBadge();
+      renderCart();
+    }
+
+    function removeCartItem(index) {
+      if (!cart[index]) return;
+      const removedName = cart[index].name;
+      cart.splice(index, 1);
+      updateCartBadge();
+      renderCart();
+      showToast('Đã xóa "' + removedName + '" khỏi giỏ hàng');
+    }
+
+    function clearAllCart() {
+      cart = [];
+      appliedDiscount = 0;
+      appliedPromoCode = "";
+      updateCartBadge();
+      renderCart();
+      showToast('Đã làm trống giỏ hàng');
+    }
+
+    function applyPromoCode() {
+      const inputEl = document.getElementById('promo-code-input');
+      if (!inputEl) return;
+      const code = inputEl.value.trim().toUpperCase();
+
+      if (code === 'CS2PRO' || code === 'GLOVESVAULT' || code === 'GLOVEVAULT') {
+        appliedDiscount = 100000;
+        appliedPromoCode = code;
+        showToast('🎉 Áp dụng mã ' + code + ' thành công (-100.000đ)!');
+      } else if (code === 'RANKUP') {
+        appliedDiscount = 150000;
+        appliedPromoCode = code;
+        showToast('🎉 Áp dụng mã RANKUP thành công (-150.000đ)!');
+      } else {
+        appliedDiscount = 0;
+        appliedPromoCode = "";
+        showToast('⚠️ Mã giảm giá không hợp lệ! Thử mã: CS2PRO');
+      }
+      renderCart();
+    }
+
+    function selectPaymentMethod(method) {
+      // Giữ lại thông tin người dùng đang nhập dở trên form trước khi cập nhật phương thức thanh toán
+      const savedName = document.getElementById('cust-name')?.value || '';
+      const savedPhone = document.getElementById('cust-phone')?.value || '';
+      const savedAddress = document.getElementById('cust-address')?.value || '';
+      const savedNote = document.getElementById('cust-note')?.value || '';
+
+      selectedPaymentMethod = method;
+      renderCart();
+
+      if (document.getElementById('cust-name')) document.getElementById('cust-name').value = savedName;
+      if (document.getElementById('cust-phone')) document.getElementById('cust-phone').value = savedPhone;
+      if (document.getElementById('cust-address')) document.getElementById('cust-address').value = savedAddress;
+      if (document.getElementById('cust-note')) document.getElementById('cust-note').value = savedNote;
+    }
+
+    function renderCart() {
+      const container = document.getElementById('cart-content-area');
+      if (!container) return;
+
+      updateCartBadge();
+
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="bg-card border rounded-3xl p-12 text-center max-w-xl mx-auto my-8 space-y-6">
+            <div class="w-24 h-24 rounded-full bg-sidebar border flex items-center justify-center mx-auto text-4xl">
+              🧤
+            </div>
+            <div class="space-y-2">
+              <h2 class="text-xl font-black text-primary">Giỏ hàng của bạn đang trống</h2>
+              <p class="text-xs sm:text-sm text-secondary max-w-md mx-auto">
+                Bạn chưa thêm đôi găng tay nào vào giỏ hàng. Hãy khám phá bộ sưu tập ngay!
+              </p>
+            </div>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+              <button onclick="showProductList()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-wider px-7 py-3.5 rounded-xl transition-all cursor-pointer shadow-lg">
+                Khám phá 12 mẫu găng tay
+              </button>
+              <button onclick="openProductDetail(1)" class="w-full sm:w-auto bg-card border hover:border-blue-500 text-primary font-bold text-xs uppercase tracking-wider px-7 py-3.5 rounded-xl transition-all cursor-pointer">
+                Xem Pandora's Box
+              </button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const shippingFee = subtotal >= 1000000 ? 0 : 35000;
+      const finalTotal = Math.max(0, subtotal + shippingFee - appliedDiscount);
+
+      container.innerHTML = `
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          <!-- CỘT TRÁI (7 CỘT): DANH SÁCH SẢN PHẨM TRONG GIỎ -->
+          <div class="lg:col-span-7 space-y-4">
+            <div class="flex items-center justify-between text-xs text-secondary px-1">
+              <span>Danh sách trang bị đã chọn (${getTotalCartQuantity()} đôi)</span>
+              <button onclick="clearAllCart()" class="text-red-400 hover:text-red-300 underline cursor-pointer">
+                Xóa toàn bộ giỏ hàng
+              </button>
+            </div>
+
+            ${cart.map((item, idx) => `
+              <div class="bg-card border rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all hover:border-blue-500/50">
+                
+                <!-- Ảnh & Thông tin -->
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                  <div onclick="openProductDetail(${item.productId})" class="w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-img-container border p-2 flex items-center justify-center flex-shrink-0 cursor-pointer">
+                    ${item.image ? `
+                      <img id="cart-img-${idx}" src="${item.image}" alt="${item.name}" onload="makeCutoutTransparent(this)" onerror="handleSmartImgError(this, ${item.productId}, 'main', 0)" class="main-cutout-img max-h-full max-w-full object-contain" />
+                    ` : `
+                      <span class="text-[10px] text-secondary italic">Chưa có ảnh</span>
+                    `}
+                  </div>
+                  <div class="space-y-1.5 flex-1">
+                    <div class="flex items-center gap-2">
+                      <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-blue-500/10 text-blue-500 border border-blue-500/20">${item.game}</span>
+                      ${item.tag ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded bg-gray-800 text-gray-100 border border-gray-600">${item.tag}</span>` : ''}
+                    </div>
+                    <h3 onclick="openProductDetail(${item.productId})" class="font-bold text-primary text-sm sm:text-base hover:text-blue-500 cursor-pointer transition-colors">${item.name}</h3>
+                    <p class="text-[11px] text-secondary">Kích cỡ: <span class="text-primary font-semibold">One Size (Tiêu chuẩn)</span></p>
+                  </div>
+                </div>
+
+                <!-- Số lượng & Thành tiền -->
+                <div class="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto border-t sm:border-t-0 border-gray-700/20 pt-3 sm:pt-0 gap-3">
+                  <div class="text-base font-extrabold text-primary">
+                    ${formatMoney(item.price * item.quantity)}
+                  </div>
+
+                  <div class="flex items-center gap-3">
+                    <div class="flex items-center bg-sidebar border rounded-xl overflow-hidden">
+                      <button onclick="updateCartItemQty(${idx}, -1)" class="w-8 h-8 flex items-center justify-center text-primary hover:bg-blue-600 hover:text-white transition-colors cursor-pointer font-bold">−</button>
+                      <span class="w-8 text-center text-xs font-bold text-primary">${item.quantity}</span>
+                      <button onclick="updateCartItemQty(${idx}, 1)" class="w-8 h-8 flex items-center justify-center text-primary hover:bg-blue-600 hover:text-white transition-colors cursor-pointer font-bold">+</button>
+                    </div>
+
+                    <button onclick="removeCartItem(${idx})" title="Xóa khỏi giỏ" class="p-2 rounded-xl bg-sidebar border text-secondary hover:text-red-500 hover:border-red-500/50 transition-all cursor-pointer">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            `).join('')}
+
+            <!-- Cam kết bảo vệ người mua -->
+            <div class="bg-sidebar border rounded-2xl p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-secondary">
+              <div class="flex items-center gap-2.5">
+                <span class="text-lg">🚚</span>
+                <span>Miễn phí vận chuyển toàn quốc cho đơn từ 1.000.000đ</span>
+              </div>
+              <div class="flex items-center gap-2.5">
+                <span class="text-lg">✈️</span>
+                <span>Hàng Order nhập khẩu chính ngạch (Giao dự kiến 14 – 21 ngày)</span>
+              </div>
+              <div class="flex items-center gap-2.5">
+                <span class="text-lg">🔄</span>
+                <span>Hỗ trợ đổi trả miễn phí trong 7 ngày</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CỘT PHẢI (5 CỘT): TÓM TẮT ĐƠN HÀNG & FORM THANH TOÁN -->
+          <div class="lg:col-span-5 bg-card border rounded-2xl p-6 space-y-6">
+            <h2 class="text-lg font-black text-primary border-b border-gray-700/30 pb-3">
+              Tóm tắt đơn hàng
+            </h2>
+
+            <!-- Mã giảm giá -->
+            <div class="space-y-2">
+              <label class="text-xs font-bold uppercase tracking-wider text-secondary block">Mã giảm giá (Thử: CS2PRO)</label>
+              <div class="flex gap-2">
+                <input 
+                  type="text" 
+                  id="promo-code-input" 
+                  value="${appliedPromoCode}"
+                  placeholder="Nhập mã CS2PRO hoặc GLOVESVAULT" 
+                  class="flex-1 bg-sidebar border text-xs text-primary rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 uppercase"
+                />
+                <button onclick="applyPromoCode()" type="button" class="bg-gray-900 hover:bg-black text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all cursor-pointer">
+                  Áp dụng
+                </button>
+              </div>
+            </div>
+
+            <!-- Chi tiết giá -->
+            <div class="space-y-3 text-sm border-y border-gray-700/30 py-4">
+              <div class="flex justify-between text-secondary">
+                <span>Tạm tính (${getTotalCartQuantity()} sản phẩm)</span>
+                <span class="font-bold text-primary">${formatMoney(subtotal)}</span>
+              </div>
+              <div class="flex justify-between text-secondary">
+                <span>Phí vận chuyển</span>
+                <span class="font-bold text-emerald-500">${shippingFee === 0 ? 'Miễn phí (0đ)' : formatMoney(shippingFee)}</span>
+              </div>
+              ${appliedDiscount > 0 ? `
+                <div class="flex justify-between text-emerald-500">
+                  <span>Mã giảm giá (${appliedPromoCode})</span>
+                  <span class="font-bold">-${formatMoney(appliedDiscount)}</span>
+                </div>
+              ` : ''}
+              <div class="flex justify-between items-center pt-2 border-t border-gray-700/20 text-base">
+                <span class="font-extrabold text-primary">Tổng thanh toán</span>
+                <span class="text-2xl font-black text-blue-500">${formatMoney(finalTotal)}</span>
+              </div>
+            </div>
+
+            <!-- Form thông tin người nhận -->
+            <form onsubmit="submitCheckoutOrder(event)" class="space-y-4 text-xs">
+              <h3 class="font-bold uppercase tracking-wider text-secondary">Thông tin giao hàng</h3>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-secondary mb-1">Họ và tên *</label>
+                  <input type="text" id="cust-name" required placeholder="Nguyễn Văn A" class="w-full bg-sidebar border rounded-xl px-3.5 py-2.5 text-primary focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+                <div>
+                  <label class="block text-secondary mb-1">Số điện thoại *</label>
+                  <input type="tel" id="cust-phone" required placeholder="0901 234 567" class="w-full bg-sidebar border rounded-xl px-3.5 py-2.5 text-primary focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-secondary mb-1">Địa chỉ nhận hàng chi tiết *</label>
+                <input type="text" id="cust-address" required placeholder="Số nhà, tên đường, Phường/Xã, Quận/Huyện, Tỉnh/TP" class="w-full bg-sidebar border rounded-xl px-3.5 py-2.5 text-primary focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+
+              <div>
+                <label class="block text-secondary mb-1">Ghi chú đơn hàng (Tùy chọn)</label>
+                <input type="text" id="cust-note" placeholder="Ghi chú thêm về đơn hàng..." class="w-full bg-sidebar border rounded-xl px-3.5 py-2.5 text-primary focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+
+              <!-- Phương thức thanh toán + Hiển thị thẻ QR trực tiếp -->
+              <div class="space-y-2 pt-1">
+                <label class="block font-bold uppercase tracking-wider text-secondary">Phương thức thanh toán (Chuyển khoản trước)</label>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <button 
+                    type="button"
+                    onclick="selectPaymentMethod('BANK')"
+                    class="p-2.5 rounded-xl border text-left transition-all cursor-pointer flex items-center gap-2 ${selectedPaymentMethod === 'BANK' ? 'border-blue-500 bg-blue-500/15 text-primary ring-2 ring-blue-500/20' : 'bg-sidebar border-gray-700/40 text-secondary'}"
+                  >
+                    <span class="text-base">🏦</span>
+                    <div>
+                      <div class="font-bold text-xs">Ngân hàng</div>
+                      <div class="text-[10px] opacity-80">Sacombank QR</div>
+                    </div>
+                  </button>
+
+                  <button 
+                    type="button"
+                    onclick="selectPaymentMethod('MOMO')"
+                    class="p-2.5 rounded-xl border text-left transition-all cursor-pointer flex items-center gap-2 ${selectedPaymentMethod === 'MOMO' ? 'border-pink-500 bg-pink-500/15 text-primary ring-2 ring-pink-500/20' : 'bg-sidebar border-gray-700/40 text-secondary'}"
+                  >
+                    <span class="text-base">📱</span>
+                    <div>
+                      <div class="font-bold text-xs">Ví MoMo</div>
+                      <div class="text-[10px] opacity-80">Quét mã QR</div>
+                    </div>
+                  </button>
+
+                  <button 
+                    type="button"
+                    onclick="selectPaymentMethod('PAYPAL')"
+                    class="p-2.5 rounded-xl border text-left transition-all cursor-pointer flex items-center gap-2 ${selectedPaymentMethod === 'PAYPAL' ? 'border-amber-400 bg-amber-400/15 text-primary ring-2 ring-amber-400/20' : 'bg-sidebar border-gray-700/40 text-secondary'}"
+                  >
+                    <span class="text-base">💳</span>
+                    <div>
+                      <div class="font-bold text-xs">PayPal</div>
+                      <div class="text-[10px] opacity-80">Quốc tế</div>
+                    </div>
+                  </button>
+                </div>
+
+                <!-- KHUNG HIỂN THỊ MÃ QR / NÚT PAYPAL TƯƠNG ỨNG -->
+                ${getPaymentDetailWidgetHTML(selectedPaymentMethod, finalTotal, 'GLOVES VAULT')}
+              </div>
+
+              <button type="submit" id="checkout-submit-btn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-xl text-sm uppercase tracking-wider transition-all shadow-lg hover:scale-[1.01] cursor-pointer mt-2">
+                Xác Nhận Đã Thanh Toán & Đặt Hàng
+              </button>
+            </form>
+
+          </div>
+
+        </div>
+      `;
+    }
+
+    function submitCheckoutOrder(event) {
+      event.preventDefault();
+      if (cart.length === 0) return;
+
+      const name = document.getElementById('cust-name').value.trim();
+      const phone = document.getElementById('cust-phone').value.trim();
+      const address = document.getElementById('cust-address').value.trim();
+      const note = document.getElementById('cust-note')?.value.trim() || 'Không có ghi chú';
+
+      const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const shippingFee = subtotal >= 1000000 ? 0 : 35000;
+      const finalTotal = Math.max(0, subtotal + shippingFee - appliedDiscount);
+      const orderCode = 'GV-' + Math.floor(100000 + Math.random() * 900000);
+
+      const paymentLabels = {
+        'BANK': 'Chuyển khoản Ngân hàng Sacombank (040100313024)',
+        'MOMO': 'Ví điện tử MoMo (PSP2600318400000414)',
+        'PAYPAL': 'Cổng thanh toán quốc tế PayPal'
+      };
+
+      // Tổng hợp danh sách sản phẩm khách đặt để bắn về kênh Discord Đơn hàng
+      const itemsTextList = cart.map(item => `• **${item.name}** (${item.game}) × ${item.quantity} — ${formatMoney(item.price * item.quantity)}`).join('\n');
+
+      if (DISCORD_ORDER_WEBHOOK_URL && DISCORD_ORDER_WEBHOOK_URL.startsWith('http')) {
+        const discordPayload = {
+          username: "GLOVES VAULT Order Bot",
+          content: `🚨 **ĐƠN HÀNG MỚI #${orderCode} — ${formatMoney(finalTotal)}** 🚨`,
+          embeds: [{
+            title: `🛒 Chi Tiết Đơn Hàng #${orderCode}`,
+            color: 5763719, // Màu xanh lá Emerald
+            fields: [
+              { name: "👤 Người nhận", value: `${name}`, inline: true },
+              { name: "📞 Số điện thoại", value: `**${phone}**`, inline: true },
+              { name: "💳 Phương thức thanh toán", value: paymentLabels[selectedPaymentMethod] || selectedPaymentMethod, inline: false },
+              { name: "📍 Địa chỉ nhận hàng", value: address, inline: false },
+              { name: "🧤 Sản phẩm đã đặt", value: itemsTextList, inline: false },
+              { name: "🎟️ Mã giảm giá", value: appliedPromoCode ? `${appliedPromoCode} (-${formatMoney(appliedDiscount)})` : "Không sử dụng", inline: true },
+              { name: "🚚 Phí vận chuyển", value: shippingFee === 0 ? "Miễn phí (0đ)" : formatMoney(shippingFee), inline: true },
+              { name: "💰 TỔNG THANH TOÁN", value: `**${formatMoney(finalTotal)}**`, inline: true },
+              { name: "📝 Ghi chú từ khách", value: note, inline: false }
+            ],
+            footer: { text: "GLOVES VAULT E-Commerce System" },
+            timestamp: new Date().toISOString()
+          }]
+        };
+
+        fetch(DISCORD_ORDER_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(discordPayload)
+        }).catch(err => console.error("Lỗi gửi Discord Đơn hàng:", err));
+      }
+
+      const itemsSummaryHtml = cart.map(item => `
+        <div class="flex justify-between items-center py-1 border-b border-gray-700/20">
+          <span>${item.name} × ${item.quantity}</span>
+          <span class="font-bold text-primary">${formatMoney(item.price * item.quantity)}</span>
+        </div>
+      `).join('');
+
+      const modalSummary = document.getElementById('order-modal-summary');
+      modalSummary.innerHTML = `
+        <div class="flex justify-between items-center text-sm font-bold text-blue-500 pb-2 border-b border-gray-700/30">
+          <span>Mã đơn hàng:</span>
+          <span>#${orderCode}</span>
+        </div>
+        <div class="space-y-1 py-1">
+          ${itemsSummaryHtml}
+        </div>
+        <div class="pt-2 space-y-1 text-secondary">
+          <div><strong class="text-primary">Người nhận:</strong> ${name} (${phone})</div>
+          <div><strong class="text-primary">Địa chỉ:</strong> ${address}</div>
+          <div><strong class="text-primary">Thanh toán:</strong> ${paymentLabels[selectedPaymentMethod]}</div>
+          <div><strong class="text-primary">Dự kiến giao hàng:</strong> 14 – 21 ngày (Hàng Order nhập khẩu)</div>
+        </div>
+        <div class="flex justify-between items-center pt-3 border-t border-gray-700/30 text-sm">
+          <span class="font-bold text-primary">Tổng thanh toán:</span>
+          <span class="text-lg font-black text-emerald-500">${formatMoney(finalTotal)}</span>
+        </div>
+        ${getPaymentDetailWidgetHTML(selectedPaymentMethod, finalTotal, orderCode)}
+      `;
+
+      const modal = document.getElementById('order-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
+      // Nếu khách chọn PayPal thì tự động mở tab thanh toán PayPal hỗ trợ khách
+      if (selectedPaymentMethod === 'PAYPAL') {
+        window.open(PAYPAL_PAYMENT_URL, '_blank', 'noopener,noreferrer');
+      }
+
+      cart = [];
+      appliedDiscount = 0;
+      appliedPromoCode = "";
+      updateCartBadge();
+      renderCart();
+    }
+
+    function closeOrderModal() {
+      const modal = document.getElementById('order-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function toggleTheme() {
+      isDark = !isDark;
+      const body = document.getElementById('app-body');
+      const moonIcon = document.getElementById('moon-icon');
+      const sunIcon = document.getElementById('sun-icon');
+
+      if (isDark) {
+        body.className = "theme-dark min-h-screen flex flex-col font-sans transition-colors duration-200";
+        moonIcon.classList.remove('hidden');
+        moonIcon.classList.add('block');
+        sunIcon.classList.remove('block');
+        sunIcon.classList.add('hidden');
+      } else {
+        body.className = "theme-light min-h-screen flex flex-col font-sans transition-colors duration-200";
+        moonIcon.classList.remove('block');
+        moonIcon.classList.add('hidden');
+        sunIcon.classList.remove('hidden');
+        sunIcon.classList.add('block');
+      }
+    }
+
+    handleFilter();
+  </script>
+</body>
+</html>
